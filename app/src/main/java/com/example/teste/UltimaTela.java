@@ -5,14 +5,14 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class SegundaActivity extends AppCompatActivity {
+public class UltimaTela extends AppCompatActivity {
 
     private TextView txtSaudacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_segunda); // Layout da segunda tela
+        setContentView(R.layout.activity_ultima); // Layout da segunda tela
 
         txtSaudacao = findViewById(R.id.txtSaudacao);
 

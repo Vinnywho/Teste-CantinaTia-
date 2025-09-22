@@ -21,13 +21,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SegundaActivity"
+            android:name=".UltimaTela"
             android:exported="false">
         </activity>
         <activity
-            android:name=".TerceiraActivity"
+            android:name=".Cadastro"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".Login"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".TelaInicial"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".Carrinho"
+            android:exported="false">
+        </activity>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

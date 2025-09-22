@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TerceiraActivity">
+    tools:context=".Cadastro">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -46,11 +46,12 @@
         app:layout_constraintVertical_bias="0.144" />
 
     <EditText
-        android:id="@+id/editNome"
+        android:id="@+id/nome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="text"
+        android:hint="Digite seu nome"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
         app:layout_constraintHorizontal_bias="0.026"
@@ -64,6 +65,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="text"
+        android:hint="Digite seu RA"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
         app:layout_constraintHorizontal_bias="0.026"
@@ -77,6 +79,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="text"
+        android:hint="Digite seu email"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageView2"
         app:layout_constraintHorizontal_bias="0.026"
@@ -97,6 +100,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="numberPassword"
+        android:hint="Digite sua senha"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.031"

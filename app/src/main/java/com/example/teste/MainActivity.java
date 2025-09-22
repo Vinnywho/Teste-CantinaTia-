@@ -11,19 +11,29 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
 
-    private Button btnEnviar;
+    private Button btnLogin;
+    private Button btnCadastro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); // Layout da primeira tela
 
-        btnEnviar = findViewById(R.id.btnEnviar);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnCadastro = findViewById(R.id.btnCadastro);
 
-        btnEnviar.setOnClickListener(new View.OnClickListener() {
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent irParaTerceiraTela = new Intent(MainActivity.this, TerceiraActivity.class);
+                Intent irParaTerceiraTela = new Intent(MainActivity.this, Login.class);
+                startActivity(irParaTerceiraTela);
+            }
+        });
+
+        btnCadastro.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent irParaTerceiraTela = new Intent(MainActivity.this, Cadastro.class);
                 startActivity(irParaTerceiraTela);
             }
         });

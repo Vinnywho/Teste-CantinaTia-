@@ -8,7 +8,7 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class TerceiraActivity extends AppCompatActivity {
+public class Cadastro extends AppCompatActivity {
 
     private EditText editNome;
     private Button tenhoConta;
@@ -18,9 +18,9 @@ public class TerceiraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_terceira); // Layout da primeira tela
+        setContentView(R.layout.activity_cadastro); // Layout da primeira tela
 
-        editNome = findViewById(R.id.editNome);
+        editNome = findViewById(R.id.nome);
         tenhoConta = findViewById(R.id.tenhoConta);
         butao = findViewById(R.id.button);
 
@@ -29,7 +29,7 @@ public class TerceiraActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                Intent irParaPrimeiraTela = new Intent(TerceiraActivity.this, MainActivity.class);
+                Intent irParaPrimeiraTela = new Intent(Cadastro.this, Login.class);
                 startActivity(irParaPrimeiraTela);
             }
         });
@@ -38,7 +38,7 @@ public class TerceiraActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String nomeDigitado = editNome.getText().toString();
 
-                Intent irParaSegundaTela = new Intent(TerceiraActivity.this, SegundaActivity.class);
+                Intent irParaSegundaTela = new Intent(Cadastro.this, UltimaTela.class);
                 irParaSegundaTela.putExtra("nomeUsuario", nomeDigitado);
                 startActivity(irParaSegundaTela);
             }
