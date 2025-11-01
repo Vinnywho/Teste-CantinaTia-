@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TelaInicial">
 
-
-
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="423dp"
+        android:layout_width="0dp"
         android:layout_height="191dp"
         android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,11 +19,10 @@
 
     <ImageView
         android:id="@+id/imageView5"
-        android:layout_width="390dp"
+        android:layout_width="404dp"
         android:layout_height="154dp"
         android:layout_marginTop="84dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.486"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/rectangle_13" />
@@ -37,10 +34,23 @@
         android:layout_marginTop="64dp"
         android:text="Bem vindo(a)!"
         android:textColor="#FFFEFE"
-        android:textSize="20dp"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.294"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextText"
+        android:layout_width="314dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="136dp"
+        android:ems="10"
+        android:inputType="text"
+        android:hint="Pesquisar"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.265"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -54,182 +64,24 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/group_15" />
 
-    <EditText
-        android:id="@+id/editTextText"
-        android:layout_width="314dp"
-        android:layout_height="43dp"
-        android:layout_marginTop="136dp"
-        android:ems="10"
-        android:inputType="text"
-        android:hint="Pesquisar"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_favoritos"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="4dp"
+        app:layout_constraintBottom_toTopOf="@id/imageView10"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.265"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/imageView5"
 
-    <ImageView
-        android:id="@+id/produto1"
-        android:layout_width="132dp"
-        android:layout_height="163dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toStartOf="@+id/produto2"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
-        app:srcCompat="@drawable/rectangle_44" />
-
-    <ImageView
-        android:id="@+id/produto2"
-        android:layout_width="124dp"
-        android:layout_height="165dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toStartOf="@+id/produto3"
-        app:layout_constraintStart_toEndOf="@+id/produto1"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
-        app:srcCompat="@drawable/rectangle_44" />
-
-    <ImageView
-        android:id="@+id/produto3"
-        android:layout_width="119dp"
-        android:layout_height="168dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/produto2"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
-        app:srcCompat="@drawable/rectangle_44" />
-
-    <ImageView
-        android:id="@+id/produto5"
-        android:layout_width="124dp"
-        android:layout_height="165dp"
-        android:layout_marginTop="200dp"
-        app:layout_constraintEnd_toStartOf="@+id/produto3"
-        app:layout_constraintStart_toEndOf="@+id/produto1"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
-        app:srcCompat="@drawable/rectangle_44" />
-
-    <ImageView
-        android:id="@+id/produto4"
-        android:layout_width="132dp"
-        android:layout_height="163dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="200dp"
-        app:layout_constraintEnd_toStartOf="@+id/produto2"
-        app:layout_constraintHorizontal_bias="0.076"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
-        app:srcCompat="@drawable/rectangle_44" />
-
-    <ImageView
-        android:id="@+id/produto6"
-        android:layout_width="119dp"
-        android:layout_height="168dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginRight="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.923"
-        app:layout_constraintStart_toEndOf="@+id/produto2"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5"
-        app:srcCompat="@drawable/rectangle_44" />
-
-    <ImageView
-        android:id="@+id/bifeImg"
-        android:layout_width="89dp"
-        android:layout_height="88dp"
-        app:layout_constraintBottom_toBottomOf="@+id/produto1"
-        app:layout_constraintEnd_toEndOf="@+id/produto1"
-        app:layout_constraintHorizontal_bias="0.511"
-        app:layout_constraintStart_toStartOf="@+id/produto1"
-        app:layout_constraintTop_toTopOf="@+id/produto1"
-        app:layout_constraintVertical_bias="0.133"
-        app:srcCompat="@drawable/bife" />
-
-    <ImageView
-        android:id="@+id/frangoImg"
-        android:layout_width="87dp"
-        android:layout_height="92dp"
-        app:layout_constraintBottom_toBottomOf="@+id/produto2"
-        app:layout_constraintEnd_toEndOf="@+id/produto2"
-        app:layout_constraintHorizontal_bias="0.567"
-        app:layout_constraintStart_toStartOf="@+id/produto2"
-        app:layout_constraintTop_toTopOf="@+id/produto2"
-        app:layout_constraintVertical_bias="0.136"
-        app:srcCompat="@drawable/frango" />
-
-    <TextView
-        android:id="@+id/bife"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bife"
-        android:textStyle="bold"
-        android:textColor="#000"
-        app:layout_constraintEnd_toEndOf="@+id/produto1"
-        app:layout_constraintHorizontal_bias="0.203"
-        app:layout_constraintStart_toStartOf="@+id/produto1"
-        app:layout_constraintTop_toBottomOf="@+id/bifeImg" />
-
-    <TextView
-        android:id="@+id/frango"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Frango"
-        android:textStyle="bold"
-        android:textColor="#000"
-        app:layout_constraintEnd_toEndOf="@+id/produto2"
-        app:layout_constraintHorizontal_bias="0.259"
-        app:layout_constraintStart_toStartOf="@+id/produto2"
-        app:layout_constraintTop_toBottomOf="@+id/frangoImg" />
-
-    <TextView
-        android:id="@+id/bifePreco"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="R$ 20,00"
-        android:textColor="#28AF57"
-        app:layout_constraintEnd_toEndOf="@+id/produto1"
-        app:layout_constraintHorizontal_bias="0.285"
-        app:layout_constraintStart_toStartOf="@+id/produto1"
-        app:layout_constraintTop_toBottomOf="@+id/bife" />
-
-    <TextView
-        android:id="@+id/frangoPreco"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="R$ 25,00"
-        android:textColor="#28AF57"
-        app:layout_constraintEnd_toEndOf="@+id/produto2"
-        app:layout_constraintHorizontal_bias="0.313"
-        app:layout_constraintStart_toStartOf="@+id/produto2"
-        app:layout_constraintTop_toBottomOf="@+id/frango" />
-
-    <ImageView
-        android:id="@+id/bifeAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/produto1"
-        app:layout_constraintEnd_toEndOf="@+id/produto1"
-        app:layout_constraintHorizontal_bias="0.647"
-        app:layout_constraintStart_toEndOf="@+id/bifePreco"
-        app:srcCompat="@drawable/group_16" />
-
-    <ImageView
-        android:id="@+id/frangoAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/produto2"
-        app:layout_constraintEnd_toEndOf="@+id/produto2"
-        app:layout_constraintHorizontal_bias="0.653"
-        app:layout_constraintStart_toEndOf="@+id/frangoPreco"
-        app:srcCompat="@drawable/group_16" />
+        tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        tools:listitem="@layout/item_card_alimento"
+        tools:spanCount="3" />
 
     <ImageView
         android:id="@+id/imageView10"
-        android:layout_width="443dp"
+        android:layout_width="0dp"
         android:layout_height="112dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
