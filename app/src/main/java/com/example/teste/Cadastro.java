@@ -5,12 +5,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class Cadastro extends AppCompatActivity {
 
-    private EditText editNome;
     private Button tenhoConta;
 
     private Button butao;
@@ -18,9 +18,8 @@ public class Cadastro extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cadastro); // Layout da primeira tela
+        setContentView(R.layout.activity_cadastro);
 
-        editNome = findViewById(R.id.nome);
         tenhoConta = findViewById(R.id.tenhoConta);
         butao = findViewById(R.id.button);
 
@@ -36,10 +35,9 @@ public class Cadastro extends AppCompatActivity {
         butao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String nomeDigitado = editNome.getText().toString();
 
-                Intent irParaSegundaTela = new Intent(Cadastro.this, UltimaTela.class);
-                irParaSegundaTela.putExtra("nomeUsuario", nomeDigitado);
+                Intent irParaSegundaTela = new Intent(Cadastro.this, Login.class);
+                Toast.makeText(Cadastro.this, "Usuário adicionado com sucesso!", Toast.LENGTH_SHORT).show();
                 startActivity(irParaSegundaTela);
             }
         });

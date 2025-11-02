@@ -22,10 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".UltimaTela"
-            android:exported="false">
-        </activity>
+
         <activity
             android:name=".Cadastro"
             android:exported="false">
@@ -40,6 +37,10 @@
         </activity>
         <activity
             android:name=".Carrinho"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".Perfil"
             android:exported="false">
         </activity>
 

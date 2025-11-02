@@ -1,5 +1,6 @@
 package com.example.teste;
 
+//objeto do produto para construir a lista de alimentos
 public class Produto {
     private String nome;
     private double precoAtual;

@@ -16,19 +16,17 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login); // Layout da primeira tela
+        setContentView(R.layout.activity_login);
 
         btnEnviar = findViewById(R.id.btnEnviar);
         buto = findViewById(R.id.buto);
         nome = findViewById(R.id.nome);
 
-        // Ir para tela de Cadastro
         btnEnviar.setOnClickListener(v -> {
             Intent irParaCadastro = new Intent(Login.this, Cadastro.class);
             startActivity(irParaCadastro);
         });
 
-        // Ir para tela inicial (com nome)
         buto.setOnClickListener(v -> {
             String nomeDigitado = nome.getText().toString().trim();
 

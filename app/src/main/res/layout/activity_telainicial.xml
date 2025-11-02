@@ -70,7 +70,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:paddingHorizontal="4dp"
-        app:layout_constraintBottom_toTopOf="@id/imageView10"
+        app:layout_constraintBottom_toTopOf="@id/navbarPerfil"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView5"
@@ -80,7 +80,7 @@
         tools:spanCount="3" />
 
     <ImageView
-        android:id="@+id/imageView10"
+        android:id="@+id/navbarPerfil"
         android:layout_width="0dp"
         android:layout_height="112dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -89,35 +89,35 @@
         app:srcCompat="@drawable/rectangle_99" />
 
     <ImageView
-        android:id="@+id/homeCarrinho"
+        android:id="@+id/homeInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView10"
+        app:layout_constraintBottom_toBottomOf="@+id/navbarPerfil"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.164"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/silhueta_negra_de_casa_sem_porta__1__1" />
 
     <ImageView
-        android:id="@+id/carrinho"
+        android:id="@+id/carrinhoInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView13"
-        app:layout_constraintStart_toEndOf="@+id/homeCarrinho"
+        app:layout_constraintEnd_toStartOf="@+id/perfilInicio"
+        app:layout_constraintStart_toEndOf="@+id/homeInicio"
         app:srcCompat="@drawable/carrinho_de_compras__1__2" />
 
     <ImageView
-        android:id="@+id/imageView13"
+        android:id="@+id/perfilInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.766"
-        app:layout_constraintStart_toEndOf="@+id/homeCarrinho"
+        app:layout_constraintStart_toEndOf="@+id/homeInicio"
         app:srcCompat="@drawable/do_utilizador_2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

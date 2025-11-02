@@ -2,7 +2,6 @@ package com.example.teste;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,30 +25,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import android.app.Activity;
+
 
 public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.OnItemClickListener {
 
     private TextView txtSaudacao1;
-    private ImageView carrinho;
+    private ImageView carrinho, perfil, home;
     private RecyclerView recyclerView;
+
+
+    //não sei com funciona
     private HashMap<String, Integer> carrinhoItens = new HashMap<>();
 
-    public static final String CHAVE_QUANTIDADE_FRANGO = "quantidadeFrango";
-    public static final String CHAVE_QUANTIDADE_BIFE = "quantidadeBife";
-
-    // ATENÇÃO: Adicionei 'stock' ao SELECT
+    //chaves supabase
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=name,price,image,quantity";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
 
+    private final ActivityResultLauncher<Intent> carrinhoLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null && data.hasExtra("carrinhoAtualizado")) {
+                        HashMap<String, Integer> carrinhoAtualizado = (HashMap<String, Integer>) data.getSerializableExtra("carrinhoAtualizado");
+
+                        if (carrinhoAtualizado != null) {
+                            this.carrinhoItens = carrinhoAtualizado;
+                        }
+                    }
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_telainicial);
 
-        carrinho = findViewById(R.id.carrinho);
+        perfil = findViewById(R.id.perfilInicio);
+        carrinho = findViewById(R.id.carrinhoInicio);
         txtSaudacao1 = findViewById(R.id.txtSaudacao1);
         recyclerView = findViewById(R.id.rv_favoritos);
+        home = findViewById(R.id.homeInicio);
 
         String nomeRecebido = getIntent().getStringExtra("nomeUsuario");
         if (nomeRecebido != null && !nomeRecebido.isEmpty()) {
@@ -60,18 +80,25 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
 
         buscarProdutosSupabase();
 
-        // Lógica do botão carrinho permanece inalterada
+        // ir para o carrinho
         carrinho.setOnClickListener(v -> {
             Intent irParaCarrinho = new Intent(TelaInicial.this, Carrinho.class);
-            irParaCarrinho.putExtra(CHAVE_QUANTIDADE_FRANGO, carrinhoItens.getOrDefault("Filé de Frango", 0));
-            irParaCarrinho.putExtra(CHAVE_QUANTIDADE_BIFE, carrinhoItens.getOrDefault("Bife", 0));
-            startActivity(irParaCarrinho);
+            irParaCarrinho.putExtra("carrinhoItens", carrinhoItens);
+            carrinhoLauncher.launch(irParaCarrinho);
+        });
+
+        // ir para o perfil
+        perfil.setOnClickListener(v -> {
+            Intent irParaPerfil = new Intent(TelaInicial.this, Perfil.class);
+            startActivity(irParaPerfil);
+        });
+
+        home.setOnClickListener(v -> {
+            Toast.makeText(TelaInicial.this, "Você já está na home!", Toast.LENGTH_SHORT).show();
         });
     }
 
-    // ----------------------------------------------------
-    // LÓGICA DE BUSCA COM VOLLEY E SUPABASE
-    // ----------------------------------------------------
+    // BUSCA COM VOLLEY E SUPABASE
     private void buscarProdutosSupabase() {
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -126,34 +153,28 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         queue.add(jsonArrayRequest);
     }
 
-    // ----------------------------------------------------
-    // LÓGICA DE CONFIGURAÇÃO DO RECYCLERVIEW
-    // ----------------------------------------------------
+
+    // CONFIGURAÇÃO DO RECYCLERVIEW
+
     private void configurarRecyclerView(List<Produto> listaDeAlimentos) {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
 
-        // O AlimentoAdapter usará o novo estoque para habilitar/desabilitar o botão
+        // o AlimentoAdapter usa o novo estoque para habilitar/desabilitar o botão
         AlimentoAdapter adapter = new AlimentoAdapter(this, listaDeAlimentos, this);
         recyclerView.setAdapter(adapter);
     }
 
-    // ----------------------------------------------------
-    // IMPLEMENTAÇÃO DA INTERFACE DE CLIQUE (OnItemClickListener)
-    // ----------------------------------------------------
+    // IMPLEMENTA A INTERFACE DE CLIQUE (OnItemClickListener)
     @Override
     public void onAdicionarClick(Produto produto) {
         String nomeProduto = produto.getNome();
         int quantidadeEmCarrinho = carrinhoItens.getOrDefault(nomeProduto, 0);
 
-        // Verifica se ainda há estoque antes de adicionar
+        // verifica se ainda há estoque antes de adicionar
         if (produto.getEstoque() > quantidadeEmCarrinho) {
             carrinhoItens.put(nomeProduto, quantidadeEmCarrinho + 1);
             Toast.makeText(this, nomeProduto + " adicionado! Total em carrinho: " + (quantidadeEmCarrinho + 1), Toast.LENGTH_SHORT).show();
-
-            // NOTE: Para refletir a mudança, você precisaria notificar o Adapter,
-            // mas isso requer uma lógica de estado mais complexa (como LiveData ou ViewModel)
-
         } else {
             Toast.makeText(this, "Estoque esgotado para " + nomeProduto + "!", Toast.LENGTH_SHORT).show();
         }
