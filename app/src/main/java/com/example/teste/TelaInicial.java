@@ -122,8 +122,8 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         CarouselLayoutManager carouselLayoutManager = new CarouselLayoutManager();
         recyclerView1.setLayoutManager(carouselLayoutManager);
 
-        arrayList.add(R.drawable.promo);
-        arrayList.add(R.drawable.promo2);
+        arrayList.add(R.drawable.group389);
+        arrayList.add(R.drawable.group390);
         arrayList.add(R.drawable.sorveteloslos);
 
         ImageAdapter adapter = new ImageAdapter(TelaInicial.this, arrayList);
