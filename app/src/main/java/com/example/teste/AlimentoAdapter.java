@@ -6,32 +6,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
 import java.util.List;
 
-//não tenho ideia da metade aqui.
 
-public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.AlimentoViewHolder> {
+public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.AlimentoViewHolder> implements Filterable {
 
-    // 1. Interface de Click para comunicar com a Activity
     public interface OnItemClickListener {
         void onAdicionarClick(Produto produto);
     }
 
-    private final List<Produto> listaProdutos;
+    private List<Produto> listaProdutos;
+    private final List<Produto> listaProdutosCompleta;
     private final Context context;
-    private final OnItemClickListener listener; // Referência da Activity
+    private final OnItemClickListener listener;
 
-    // Construtor modificado para receber o Listener
     public AlimentoAdapter(Context context, List<Produto> listaProdutos, OnItemClickListener listener) {
         this.context = context;
         this.listaProdutos = listaProdutos;
+        this.listaProdutosCompleta = new ArrayList<>(listaProdutos);
         this.listener = listener;
     }
 
-    // Cria a View Holder (Infla o XML do Card)
     @NonNull
     @Override
     public AlimentoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -39,7 +40,6 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
         return new AlimentoViewHolder(view);
     }
 
-    // Vincula os Dados à View (Popula o Card)
     @Override
     public void onBindViewHolder(@NonNull AlimentoViewHolder holder, int position) {
         Produto produto = listaProdutos.get(position);
@@ -48,12 +48,10 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
         holder.nomeAlimento.setText(produto.getNome());
         holder.precoAtual.setText(String.format("R$ %.2f", produto.getPrecoAtual()));
 
-        // Define o EMOJI
         holder.emojiView.setText(produto.getEmoji());
 
         holder.txtEstoque.setText("Disponível: " + estoque);
 
-        // Lógica de clique que notifica a Activity
         holder.btnAdd.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onAdicionarClick(produto);
@@ -66,7 +64,41 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
         return listaProdutos.size();
     }
 
-    // Classe ViewHolder que referencia os componentes do item
+    @Override
+    public Filter getFilter() {
+        return foodFilter;
+    }
+
+    private final Filter foodFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Produto> listaFiltrada = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0) {
+                listaFiltrada.addAll(listaProdutosCompleta);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for (Produto item : listaProdutosCompleta) {
+                    if (item.getNome().toLowerCase().contains(filterPattern)) {
+                        listaFiltrada.add(item);
+                    }
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = listaFiltrada;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            listaProdutos.clear();
+            listaProdutos.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
+
     public static class AlimentoViewHolder extends RecyclerView.ViewHolder {
         TextView emojiView;
         TextView nomeAlimento, precoAtual, txtEstoque;

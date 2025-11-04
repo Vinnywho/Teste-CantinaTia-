@@ -13,12 +13,12 @@
         android:layout_width="555dp"
         android:layout_height="933dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/rectangle_174"
-        tools:layout_editor_absoluteX="-64dp" />
+        app:srcCompat="@drawable/rectangle_174" />
+
 
     <ImageView
         android:id="@+id/imageView4"
@@ -29,19 +29,20 @@
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.262"
+        app:layout_constraintVertical_bias="0.339"
         app:srcCompat="@drawable/vector_8" />
 
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="132dp"
         android:layout_height="70dp"
-        android:textSize="20dp"
         android:layout_marginTop="100dp"
-        android:text="Login"
         android:backgroundTint="#0D1E13"
+        android:text="Login"
+        android:textSize="20dp"
         app:layout_constraintBottom_toTopOf="@+id/btnCadastro"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView4" />
 
@@ -49,16 +50,15 @@
         android:id="@+id/btnCadastro"
         android:layout_width="132dp"
         android:layout_height="70dp"
-        android:textSize="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="#FFFFFF"
         android:text="Cadastro"
         android:textColor="#000"
-        android:backgroundTint="#FFFFFF"
+        android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
-
-
 
     <ImageView
         android:id="@+id/imageView8"

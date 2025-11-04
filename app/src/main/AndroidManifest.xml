@@ -43,6 +43,11 @@
             android:name=".Perfil"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".Pagamento"
+            android:exported="false">
+        </activity>
+
 
         <meta-data
             android:name="preloaded_fonts"

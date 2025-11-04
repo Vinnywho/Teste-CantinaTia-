@@ -1,7 +1,11 @@
 package com.example.teste;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +19,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.carousel.CarouselLayoutManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,12 +40,12 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
     private TextView txtSaudacao1;
     private ImageView carrinho, perfil, home;
     private RecyclerView recyclerView;
+    private EditText editTextText;
+    private AlimentoAdapter alimentoAdapter;
 
 
-    //não sei com funciona
     private HashMap<String, Integer> carrinhoItens = new HashMap<>();
 
-    //chaves supabase
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=name,price,image,quantity";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
 
@@ -70,6 +75,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         txtSaudacao1 = findViewById(R.id.txtSaudacao1);
         recyclerView = findViewById(R.id.rv_favoritos);
         home = findViewById(R.id.homeInicio);
+        editTextText = findViewById(R.id.editTextText);
 
         String nomeRecebido = getIntent().getStringExtra("nomeUsuario");
         if (nomeRecebido != null && !nomeRecebido.isEmpty()) {
@@ -80,14 +86,27 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
 
         buscarProdutosSupabase();
 
-        // ir para o carrinho
+        editTextText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (alimentoAdapter != null) {
+                    alimentoAdapter.getFilter().filter(s);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         carrinho.setOnClickListener(v -> {
             Intent irParaCarrinho = new Intent(TelaInicial.this, Carrinho.class);
             irParaCarrinho.putExtra("carrinhoItens", carrinhoItens);
             carrinhoLauncher.launch(irParaCarrinho);
         });
 
-        // ir para o perfil
         perfil.setOnClickListener(v -> {
             Intent irParaPerfil = new Intent(TelaInicial.this, Perfil.class);
             startActivity(irParaPerfil);
@@ -96,9 +115,21 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         home.setOnClickListener(v -> {
             Toast.makeText(TelaInicial.this, "Você já está na home!", Toast.LENGTH_SHORT).show();
         });
+
+        RecyclerView recyclerView1 = findViewById(R.id.recycler);
+        ArrayList<Integer> arrayList = new ArrayList<>();
+
+        CarouselLayoutManager carouselLayoutManager = new CarouselLayoutManager();
+        recyclerView1.setLayoutManager(carouselLayoutManager);
+
+        arrayList.add(R.drawable.promo);
+        arrayList.add(R.drawable.promo2);
+        arrayList.add(R.drawable.sorveteloslos);
+
+        ImageAdapter adapter = new ImageAdapter(TelaInicial.this, arrayList);
+        recyclerView1.setAdapter(adapter);
     }
 
-    // BUSCA COM VOLLEY E SUPABASE
     private void buscarProdutosSupabase() {
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -118,9 +149,8 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
                                 String nome = jsonProduto.getString("name");
                                 double precoAtual = jsonProduto.getDouble("price");
                                 String emoji = jsonProduto.getString("image");
-                                int estoque = jsonProduto.getInt("quantity"); // NOVO: Captura o estoque
+                                int estoque = jsonProduto.getInt("quantity");
 
-                                // NOVO CONSTRUTOR: Passando o estoque
                                 Produto produto = new Produto(nome, precoAtual, emoji, estoque);
                                 listaDeAlimentos.add(produto);
                             }
@@ -153,25 +183,19 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         queue.add(jsonArrayRequest);
     }
 
-
-    // CONFIGURAÇÃO DO RECYCLERVIEW
-
     private void configurarRecyclerView(List<Produto> listaDeAlimentos) {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
 
-        // o AlimentoAdapter usa o novo estoque para habilitar/desabilitar o botão
-        AlimentoAdapter adapter = new AlimentoAdapter(this, listaDeAlimentos, this);
-        recyclerView.setAdapter(adapter);
+        alimentoAdapter = new AlimentoAdapter(this, listaDeAlimentos, this);
+        recyclerView.setAdapter(alimentoAdapter);
     }
 
-    // IMPLEMENTA A INTERFACE DE CLIQUE (OnItemClickListener)
     @Override
     public void onAdicionarClick(Produto produto) {
         String nomeProduto = produto.getNome();
         int quantidadeEmCarrinho = carrinhoItens.getOrDefault(nomeProduto, 0);
 
-        // verifica se ainda há estoque antes de adicionar
         if (produto.getEstoque() > quantidadeEmCarrinho) {
             carrinhoItens.put(nomeProduto, quantidadeEmCarrinho + 1);
             Toast.makeText(this, nomeProduto + " adicionado! Total em carrinho: " + (quantidadeEmCarrinho + 1), Toast.LENGTH_SHORT).show();
@@ -179,4 +203,5 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
             Toast.makeText(this, "Estoque esgotado para " + nomeProduto + "!", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

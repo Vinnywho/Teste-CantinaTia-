@@ -8,56 +8,49 @@
     tools:context=".TelaInicial">
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="191dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/rectangle_126" />
-
-    <ImageView
         android:id="@+id/imageView5"
-        android:layout_width="404dp"
-        android:layout_height="154dp"
-        android:layout_marginTop="84dp"
+        android:layout_width="416dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="72dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.454"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/rectangle_13" />
-
-    <TextView
-        android:id="@+id/txtSaudacao1"
-        android:layout_width="325dp"
-        android:layout_height="29dp"
-        android:layout_marginTop="64dp"
-        android:text="Bem vindo(a)!"
-        android:textColor="#FFFEFE"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.294"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/editTextText"
         android:layout_width="314dp"
         android:layout_height="43dp"
-        android:layout_marginTop="136dp"
+        android:layout_marginTop="80dp"
+        android:background="@android:color/transparent"
         android:ems="10"
-        android:inputType="text"
         android:hint="Pesquisar"
-        app:layout_constraintStart_toStartOf="parent"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.265"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtSaudacao1"
+        android:layout_width="325dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="36dp"
+        android:text="Bem vindo(a)!"
+        android:textColor="#244F33"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.294"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView6"
         android:layout_width="37dp"
         android:layout_height="43dp"
-        android:layout_marginTop="136dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.91"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,34 +61,37 @@
         android:id="@+id/rv_favoritos"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:paddingHorizontal="4dp"
+        android:layout_marginTop="210dp"
         app:layout_constraintBottom_toTopOf="@id/navbarPerfil"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView5"
-
+        app:layout_constraintVertical_bias="1.0"
         tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         tools:listitem="@layout/item_card_alimento"
-        tools:spanCount="3" />
+        tools:spanCount="2" />
 
     <ImageView
         android:id="@+id/navbarPerfil"
         android:layout_width="0dp"
         android:layout_height="112dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/rectangle_99" />
+        app:srcCompat="@drawable/rectangle_89" />
 
     <ImageView
         android:id="@+id/homeInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="44dp"
         app:layout_constraintBottom_toBottomOf="@+id/navbarPerfil"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.164"
+        app:layout_constraintHorizontal_bias="0.167"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/silhueta_negra_de_casa_sem_porta__1__1" />
 
@@ -103,9 +99,10 @@
         android:id="@+id/carrinhoInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/perfilInicio"
+        app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toEndOf="@+id/homeInicio"
         app:srcCompat="@drawable/carrinho_de_compras__1__2" />
 
@@ -113,11 +110,22 @@
         android:id="@+id/perfilInicio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="60dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.766"
         app:layout_constraintStart_toEndOf="@+id/homeInicio"
         app:srcCompat="@drawable/do_utilizador_2" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="200sp"
+        android:layout_marginTop="4dp"
+        app:layoutManager="com.google.android.material.carousel.CarouselLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

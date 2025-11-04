@@ -9,25 +9,39 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="454dp"
-        android:layout_height="1000dp"
-        android:layout_marginEnd="-40dp"
-        android:contentDescription="@null"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/rectangle_68" />
+        app:srcCompat="@drawable/bloob_topo" />
+
+    <ImageView
+        android:id="@+id/imageView16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/bloob_em_baixo" />
+    <ImageView
+        android:id="@+id/imageView17"
+        android:layout_width="317dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:srcCompat="@drawable/rectangle_71" />
+
 
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="123dp"
         android:layout_height="118dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.212"
+        app:layout_constraintVertical_bias="0.044"
         app:srcCompat="@drawable/logo_vetorizada" />
 
     <TextView
@@ -36,100 +50,121 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/inter_bold"
         android:text="Login"
-        android:textColor="#FFFFFF"
+        android:textColor="#000"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.797"
+        app:layout_constraintHorizontal_bias="0.172"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        app:layout_constraintVertical_bias="0.185" />
 
     <EditText
         android:id="@+id/nome"
-        android:layout_width="0dp"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:ems="10"
         android:hint="Digite seu email"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.428" />
+        app:layout_constraintVertical_bias="0.378" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="29dp" />
-
-    <EditText
-        android:id="@+id/senhaEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="84dp"
-        android:autofillHints="password"
-        android:hint="Senha"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/nome"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/nome"
-        app:layout_constraintTop_toBottomOf="@+id/nome" />
+    <ImageView
+        android:id="@+id/imageView18"
+        android:layout_width="317dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:srcCompat="@drawable/rectangle_71" />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Senha"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.044"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.513" />
+        app:layout_constraintVertical_bias="0.473" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Email"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.043"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.369" />
+        app:layout_constraintVertical_bias="0.328" />
+
+
+    <EditText
+        android:id="@+id/senhaEditText"
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="112dp"
+        android:autofillHints="password"
+        android:background="@android:color/transparent"
+        android:hint="Senha"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="@+id/nome"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/nome"
+        app:layout_constraintTop_toBottomOf="@+id/nome" />
 
     <Button
         android:id="@+id/buto"
-        android:layout_width="132dp"
+        android:layout_width="140dp"
         android:layout_height="69dp"
         android:backgroundTint="#244E33"
         android:text="Confirmar"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.145"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.68" />
+        app:layout_constraintVertical_bias="0.665" />
 
     <Button
         android:id="@+id/btnEnviar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:minWidth="48dp"
+        android:layout_marginBottom="52dp"
         android:backgroundTint="#FDF9FC"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
         android:text="Cadastrar-se"
         android:textColor="#244E33"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.753"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/imageView2"
-        app:layout_constraintVertical_bias="0.921" />
+        app:layout_constraintHorizontal_bias="0.212"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/transparent"
+        android:text="Esqueci a senha"
+        android:textColor="#000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/senhaEditText" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,23 +14,23 @@ import java.util.Locale;
 public class CarrinhoAdapter extends RecyclerView.Adapter<CarrinhoAdapter.CarrinhoViewHolder> {
 
     private final List<ItemCarrinho> itens;
-    private final OnItemRemoveListener removeListener; // NOVO: Listener
+    private final OnItemRemoveListener removeListener;
 
-    // NOVO: Interface para o evento de remoção
+
     public interface OnItemRemoveListener {
         void onItemRemove(int position);
     }
 
-    public CarrinhoAdapter(List<ItemCarrinho> itens, OnItemRemoveListener listener) { // Atualizado
+    public CarrinhoAdapter(List<ItemCarrinho> itens, OnItemRemoveListener listener) {
         this.itens = itens;
-        this.removeListener = listener; // NOVO
+        this.removeListener = listener;
     }
 
     @NonNull
     @Override
     public CarrinhoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_carrinho, parent, false);
-        return new CarrinhoViewHolder(view, removeListener); // Passa o listener para o ViewHolder
+        return new CarrinhoViewHolder(view, removeListener);
     }
 
     @Override
@@ -48,16 +48,15 @@ public class CarrinhoAdapter extends RecyclerView.Adapter<CarrinhoAdapter.Carrin
         private final TextView nomeProduto;
         private final TextView qtdProduto;
         private final TextView precoProduto;
-        private final ImageView btnRemover; // NOVO
+        private final ImageView btnRemover;
 
-        public CarrinhoViewHolder(@NonNull View itemView, OnItemRemoveListener removeListener) { // Atualizado
+        public CarrinhoViewHolder(@NonNull View itemView, OnItemRemoveListener removeListener) {
             super(itemView);
             nomeProduto = itemView.findViewById(R.id.txtNomeProdutoCarrinho);
             qtdProduto = itemView.findViewById(R.id.txtQtdProdutoCarrinho);
             precoProduto = itemView.findViewById(R.id.txtPrecoProdutoCarrinho);
-            btnRemover = itemView.findViewById(R.id.btnRemoverItem); // NOVO
+            btnRemover = itemView.findViewById(R.id.btnRemoverItem);
 
-            // NOVO: Configura o clique no botão de remover
             btnRemover.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && removeListener != null) {
@@ -69,7 +68,6 @@ public class CarrinhoAdapter extends RecyclerView.Adapter<CarrinhoAdapter.Carrin
         public void bind(ItemCarrinho item) {
             nomeProduto.setText(item.getProduto().getNome());
             qtdProduto.setText("x" + item.getQuantidade());
-            // Usando o novo método getPrecoTotal() de ItemCarrinho.java
             precoProduto.setText(String.format(Locale.getDefault(), "R$ %.2f", item.getPrecoTotal()));
         }
     }

@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-// Importações do Volley
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -84,7 +84,7 @@ public class Login extends AppCompatActivity {
                         if (response.length() > 0) {
                             try {
                                 JSONObject user = response.getJSONObject(0);
-                                String nomeUsuario = user.getString("name"); // Pega o nome para personalizar
+                                String nomeUsuario = user.getString("name");
 
                                 Toast.makeText(Login.this, "Login efetuado! Bem-vindo(a), " + nomeUsuario, Toast.LENGTH_LONG).show();
 

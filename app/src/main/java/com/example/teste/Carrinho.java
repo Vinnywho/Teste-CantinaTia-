@@ -3,6 +3,7 @@ package com.example.teste;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,16 +28,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-// A classe implementa a interface do Adapter para lidar com cliques de remoção
 public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnItemRemoveListener {
 
     private TextView valorFinal, txtCarrinhoVazio;
     private ImageView home, perfil, carrinho;
     private RecyclerView rvCarrinho;
     private CarrinhoAdapter adapter;
+    private Button confirmarPagamento;
 
     private List<ItemCarrinho> listaItensCarrinho = new ArrayList<>();
-    // Este HashMap será modificado (itens removidos) e devolvido para a TelaInicial
     private HashMap<String, Integer> carrinhoItensMap;
 
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=name,price,image,quantity";
@@ -67,6 +67,7 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
         carrinho = findViewById(R.id.carrinhoCarrinho);
         rvCarrinho = findViewById(R.id.rv_carrinho);
         txtCarrinhoVazio = findViewById(R.id.txtCarrinhoVazio);
+        confirmarPagamento = findViewById(R.id.confirmarPagamento);
 
         configurarRecyclerView();
 
@@ -92,6 +93,18 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
 
         carrinho.setOnClickListener(v -> {
             Toast.makeText(Carrinho.this, "Você já está no carrinho!", Toast.LENGTH_SHORT).show();
+        });
+
+        confirmarPagamento.setOnClickListener(v -> {
+            double total = 0.0;
+
+            for (ItemCarrinho item : listaItensCarrinho) {
+                total += item.getPrecoTotal();
+            }
+
+            Intent irParaPagamento = new Intent(Carrinho.this, Pagamento.class);
+            irParaPagamento.putExtra("total", String.valueOf(total));
+            startActivity(irParaPagamento);
         });
     }
 
@@ -163,7 +176,7 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
                         }
 
                         adapter.notifyDataSetChanged();
-                        // Calcula o total inicial
+
                         recalcularTotal();
 
                     } catch (JSONException e) {
