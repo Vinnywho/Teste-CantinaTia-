@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,19 +40,15 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
     private List<ItemCarrinho> listaItensCarrinho = new ArrayList<>();
     private HashMap<String, Integer> carrinhoItensMap;
 
-    private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=name,price,image,quantity";
+    private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=id,name,price,image,quantity";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
-
 
 
     @Override
     public void onBackPressed() {
         Intent intentDeRetorno = new Intent();
-
         intentDeRetorno.putExtra("carrinhoAtualizado", carrinhoItensMap);
-
         setResult(RESULT_OK, intentDeRetorno);
-
         super.onBackPressed();
     }
 
@@ -104,6 +101,7 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
 
             Intent irParaPagamento = new Intent(Carrinho.this, Pagamento.class);
             irParaPagamento.putExtra("total", String.valueOf(total));
+            irParaPagamento.putExtra("itensCarrinho", (Serializable) listaItensCarrinho);
             startActivity(irParaPagamento);
         });
     }
@@ -165,18 +163,18 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
                             String nome = jsonProduto.getString("name");
 
                             if (carrinhoItensMap.containsKey(nome)) {
+                                int id = jsonProduto.getInt("id");
                                 double preco = jsonProduto.getDouble("price");
                                 String emoji = jsonProduto.getString("image");
                                 int estoque = jsonProduto.getInt("quantity");
                                 int quantidadeNoCarrinho = carrinhoItensMap.get(nome);
 
-                                Produto produtoCompleto = new Produto(nome, preco, emoji, estoque);
+                                Produto produtoCompleto = new Produto(id, nome, preco, emoji, estoque);
                                 listaItensCarrinho.add(new ItemCarrinho(produtoCompleto, quantidadeNoCarrinho));
                             }
                         }
 
                         adapter.notifyDataSetChanged();
-
                         recalcularTotal();
 
                     } catch (JSONException e) {

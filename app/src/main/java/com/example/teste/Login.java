@@ -1,6 +1,7 @@
 package com.example.teste;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -85,6 +86,12 @@ public class Login extends AppCompatActivity {
                             try {
                                 JSONObject user = response.getJSONObject(0);
                                 String nomeUsuario = user.getString("name");
+                                String emailUsuario = user.getString("email");
+
+                                SharedPreferences preferenciasCompartilhadas = getSharedPreferences("PreferenciasUsuario", MODE_PRIVATE); // 'sharedPreferences' para 'preferenciasCompartilhadas'
+                                SharedPreferences.Editor editor = preferenciasCompartilhadas.edit();
+                                editor.putString("emailDoUsuario", emailUsuario);
+                                editor.apply();
 
                                 Toast.makeText(Login.this, "Login efetuado! Bem-vindo(a), " + nomeUsuario, Toast.LENGTH_LONG).show();
 

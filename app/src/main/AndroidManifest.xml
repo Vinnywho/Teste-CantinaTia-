@@ -47,6 +47,10 @@
             android:name=".Pagamento"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".PedidoConfirmado"
+            android:exported="false">
+        </activity>
 
 
         <meta-data

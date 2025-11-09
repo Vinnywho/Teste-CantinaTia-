@@ -66,18 +66,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="24dp"
         android:text="VISA, MASTERCARD, ELO, HIPERCARD, VR"
         app:layout_constraintBottom_toBottomOf="@+id/credito"
         app:layout_constraintEnd_toEndOf="@+id/credito"
-        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="@+id/credito" />
 
     <TextView
         android:id="@+id/textView16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="32dp"
         android:text="VISA, MASTERCARD, ELO, HIPERCARD, VR"
         app:layout_constraintBottom_toBottomOf="@+id/debito"
         app:layout_constraintEnd_toEndOf="@+id/debito"
@@ -145,7 +145,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/credito">
 
@@ -176,13 +176,13 @@
             app:layout_constraintEnd_toEndOf="@+id/debito"
             app:layout_constraintHorizontal_bias="0.158"
             app:layout_constraintStart_toStartOf="@+id/debito"
-            app:layout_constraintTop_toTopOf="@+id/debito"/>
+            app:layout_constraintTop_toTopOf="@+id/debito" />
 
         <RadioButton
             android:id="@+id/pgtPix"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="85dp"
+            android:layout_marginTop="89dp"
             android:text="Pix"
             android:textColor="#000"
             android:textSize="20dp"
@@ -197,7 +197,7 @@
             android:id="@+id/pgtDinheiro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="85dp"
+            android:layout_marginTop="90dp"
             android:text="Dinheiro"
             android:textColor="#000"
             android:textSize="20dp"

@@ -1,21 +1,32 @@
 package com.example.teste;
 
-//objeto do produto para construir a lista de alimentos
-public class Produto {
+import java.io.Serializable;
+
+public class Produto implements Serializable {
+    private int id;
     private String nome;
-    private double precoAtual;
+    private double preco;
     private String emoji;
     private int estoque;
 
-    public Produto(String nome, double precoAtual, String emoji, int estoque) {
+    public Produto(int id, String nome, double preco, String emoji, int estoque) {
+        this.id = id;
         this.nome = nome;
-        this.precoAtual = precoAtual;
+        this.preco = preco;
         this.emoji = emoji;
         this.estoque = estoque;
     }
 
+    public Produto(String nome, double preco, String emoji, int estoque) {
+        this.nome = nome;
+        this.preco = preco;
+        this.emoji = emoji;
+        this.estoque = estoque;
+    }
+
+    public int getId() { return id; }
     public String getNome() { return nome; }
-    public double getPrecoAtual() { return precoAtual; }
+    public double getPrecoAtual() { return preco; }
     public String getEmoji() { return emoji; }
     public int getEstoque() { return estoque; }
 }
