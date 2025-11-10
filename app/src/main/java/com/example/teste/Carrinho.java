@@ -31,19 +31,23 @@ import java.util.Map;
 
 public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnItemRemoveListener {
 
+    // declaração de variáveis
     private TextView valorFinal, txtCarrinhoVazio;
     private ImageView home, perfil, carrinho;
     private RecyclerView rvCarrinho;
     private CarrinhoAdapter adapter;
     private Button confirmarPagamento;
 
+    // declaração de listas
     private List<ItemCarrinho> listaItensCarrinho = new ArrayList<>();
+    // declaração de hashmap para armazenar os itens do carrinho
     private HashMap<String, Integer> carrinhoItensMap;
 
+    // chaves supabase
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=id,name,price,image,quantity";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
 
-
+    // retorno de dados do carrinho para a tela anterior
     @Override
     public void onBackPressed() {
         Intent intentDeRetorno = new Intent();
@@ -52,12 +56,12 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
         super.onBackPressed();
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_carrinho);
 
+        // vincular variáveis
         valorFinal = findViewById(R.id.valorFinal);
         home = findViewById(R.id.homeCarrinho);
         perfil = findViewById(R.id.perfilCarrinho);
@@ -66,32 +70,36 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
         txtCarrinhoVazio = findViewById(R.id.txtCarrinhoVazio);
         confirmarPagamento = findViewById(R.id.confirmarPagamento);
 
+        // configurar recycler view e adapter para exibir os itens do carrinho
         configurarRecyclerView();
 
+        // receber dados do carrinho da tela anterior e armazenar no hashmap
         Intent intent = getIntent();
         carrinhoItensMap = (HashMap<String, Integer>) intent.getSerializableExtra("carrinhoItens");
 
+        // verificar se o hashmap não está vazio e buscar detalhes dos produtos
         if (carrinhoItensMap != null && !carrinhoItensMap.isEmpty()) {
-            txtCarrinhoVazio.setVisibility(View.GONE);
-            rvCarrinho.setVisibility(View.VISIBLE);
+            txtCarrinhoVazio.setVisibility(View.GONE); // ocultar texto de carrinho vazio
+            rvCarrinho.setVisibility(View.VISIBLE); // exibir recycler view com os itens do carrinho
             buscarDetalhesDosProdutos(carrinhoItensMap);
         } else {
             exibirCarrinhoVazio();
         }
 
+        // ação botão home
         home.setOnClickListener(v -> {
             onBackPressed();
         });
-
+        // ação botão perfil
         perfil.setOnClickListener(v -> {
             Intent irParaPerfil = new Intent(Carrinho.this, Perfil.class);
             startActivity(irParaPerfil);
         });
-
+        // ação botão carrinho (não faz nada)
         carrinho.setOnClickListener(v -> {
             Toast.makeText(Carrinho.this, "Você já está no carrinho!", Toast.LENGTH_SHORT).show();
         });
-
+        // ação botão confirmar pagamento (ir para tela de pagamento)
         confirmarPagamento.setOnClickListener(v -> {
             double total = 0.0;
 
@@ -105,14 +113,14 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
             startActivity(irParaPagamento);
         });
     }
-
+    // função para configurar o recycler view e adapter para exibir os itens do carrinho
     private void configurarRecyclerView() {
         rvCarrinho.setLayoutManager(new LinearLayoutManager(this));
         adapter = new CarrinhoAdapter(listaItensCarrinho, this);
         rvCarrinho.setAdapter(adapter);
     }
 
-
+    // função para remover um item do carrinho
     @Override
     public void onItemRemove(int position) {
         ItemCarrinho itemRemovido = listaItensCarrinho.remove(position);
@@ -132,7 +140,7 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
             exibirCarrinhoVazio();
         }
     }
-
+    // função para recalcular o valor total do carrinho após a remoção de um item
     private void recalcularTotal() {
         double totalCompra = 0.0;
         for (ItemCarrinho item : listaItensCarrinho) {
@@ -140,16 +148,18 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
         }
         valorFinal.setText(String.format(Locale.getDefault(), "R$ %.2f", totalCompra));
     }
-
+    // função para exibir o texto de carrinho vazio
     private void exibirCarrinhoVazio() {
         txtCarrinhoVazio.setVisibility(View.VISIBLE);
         rvCarrinho.setVisibility(View.GONE);
         valorFinal.setText(String.format(Locale.getDefault(), "R$ %.2f", 0.0));
     }
 
+    // função para buscar os detalhes dos produtos a partir da API do Supabase
     private void buscarDetalhesDosProdutos(HashMap<String, Integer> carrinhoItensMap) {
         RequestQueue queue = Volley.newRequestQueue(this);
 
+        // fazer requisição GET para a API do Supabase para buscar os detalhes dos produtos
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                 Request.Method.GET,
                 SUPABASE_URL,
@@ -174,6 +184,7 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
                             }
                         }
 
+                        // atualizar o adapter com os novos itens do carrinho e recalcular o valor total
                         adapter.notifyDataSetChanged();
                         recalcularTotal();
 
@@ -186,6 +197,7 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
                     error.printStackTrace();
                     Toast.makeText(Carrinho.this, "Erro de rede ao buscar detalhes dos produtos.", Toast.LENGTH_SHORT).show();
                 }) {
+            // configurar cabeçalho da requisição com a chave de autenticação
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
@@ -194,6 +206,7 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
                 return headers;
             }
         };
+        // adicionar requisição à fila de requisições do Volley
         queue.add(jsonArrayRequest);
     }
 }

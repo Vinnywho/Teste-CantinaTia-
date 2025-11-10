@@ -37,6 +37,7 @@ import android.app.Activity;
 
 public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.OnItemClickListener {
 
+    // declarar variáveis
     private TextView txtSaudacao1;
     private ImageView carrinho, perfil, home;
     private RecyclerView recyclerView;
@@ -44,11 +45,14 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
     private AlimentoAdapter alimentoAdapter;
 
 
+    // declarar variáveis de controle de fluxo
     private HashMap<String, Integer> carrinhoItens = new HashMap<>();
 
+    // chaves do supabase
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=name,price,image,quantity";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
 
+    // launcher para abrir a tela de carrinho e receber os dados de retorno
     private final ActivityResultLauncher<Intent> carrinhoLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -70,6 +74,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_telainicial);
 
+        // vincular variáveis
         perfil = findViewById(R.id.perfilInicio);
         carrinho = findViewById(R.id.carrinhoInicio);
         txtSaudacao1 = findViewById(R.id.txtSaudacao1);
@@ -77,6 +82,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         home = findViewById(R.id.homeInicio);
         editTextText = findViewById(R.id.editTextText);
 
+        // pegar nome do usuário
         String nomeRecebido = getIntent().getStringExtra("nomeUsuario");
         if (nomeRecebido != null && !nomeRecebido.isEmpty()) {
             txtSaudacao1.setText("Bem vindo(a), " + nomeRecebido + "!");
@@ -86,10 +92,12 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
 
         buscarProdutosSupabase();
 
+        // ação botão "pesquisar"
         editTextText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
+            // ao digitar, filtrar a lista
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (alimentoAdapter != null) {
@@ -97,21 +105,25 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
                 }
             }
 
+            // ao limpar, voltar para a lista original
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
+        // ação botão "carrinho"
         carrinho.setOnClickListener(v -> {
             Intent irParaCarrinho = new Intent(TelaInicial.this, Carrinho.class);
             irParaCarrinho.putExtra("carrinhoItens", carrinhoItens);
             carrinhoLauncher.launch(irParaCarrinho);
         });
 
+        // ação botão "perfil"
         perfil.setOnClickListener(v -> {
             Intent irParaPerfil = new Intent(TelaInicial.this, Perfil.class);
             startActivity(irParaPerfil);
         });
 
+        // ação botão "home"
         home.setOnClickListener(v -> {
             Toast.makeText(TelaInicial.this, "Você já está na home!", Toast.LENGTH_SHORT).show();
         });
@@ -119,20 +131,25 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         RecyclerView recyclerView1 = findViewById(R.id.recycler);
         ArrayList<Integer> arrayList = new ArrayList<>();
 
+        // configurar layout manager e adapter para o RecyclerView
         CarouselLayoutManager carouselLayoutManager = new CarouselLayoutManager();
         recyclerView1.setLayoutManager(carouselLayoutManager);
 
+        // adicionar imagens ao ArrayList
         arrayList.add(R.drawable.group389);
         arrayList.add(R.drawable.group390);
         arrayList.add(R.drawable.sorveteloslos);
 
+        // configurar adapter para o RecyclerView
         ImageAdapter adapter = new ImageAdapter(TelaInicial.this, arrayList);
         recyclerView1.setAdapter(adapter);
     }
 
+    // buscar produtos do Supabase
     private void buscarProdutosSupabase() {
         RequestQueue queue = Volley.newRequestQueue(this);
 
+        // fazer requisição GET para a API do Supabase
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                 Request.Method.GET,
                 SUPABASE_URL,
@@ -143,6 +160,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
                         try {
                             List<Produto> listaDeAlimentos = new ArrayList<>();
 
+                            // percorrer a resposta JSON e adicionar os produtos à lista
                             for (int i = 0; i < response.length(); i++) {
                                 JSONObject jsonProduto = response.getJSONObject(i);
 
@@ -155,6 +173,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
                                 listaDeAlimentos.add(produto);
                             }
 
+                            // configurar o RecyclerView com a lista de produtos
                             configurarRecyclerView(listaDeAlimentos);
 
                         } catch (JSONException e) {
@@ -164,6 +183,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
                     }
                 },
                 new com.android.volley.Response.ErrorListener() {
+                    // lidar com erros de rede
                     @Override
                     public void onErrorResponse(com.android.volley.VolleyError error) {
                         Toast.makeText(TelaInicial.this, "Erro de rede ou Supabase.", Toast.LENGTH_LONG).show();
@@ -171,6 +191,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
                     }
                 })
         {
+            // configurar cabeçalho da requisição com a chave de autenticação
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
@@ -183,6 +204,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         queue.add(jsonArrayRequest);
     }
 
+    // configurar o RecyclerView com a lista de produtos
     private void configurarRecyclerView(List<Produto> listaDeAlimentos) {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
@@ -191,11 +213,13 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         recyclerView.setAdapter(alimentoAdapter);
     }
 
+    // lidar com o clique em um produto no RecyclerView
     @Override
     public void onAdicionarClick(Produto produto) {
         String nomeProduto = produto.getNome();
         int quantidadeEmCarrinho = carrinhoItens.getOrDefault(nomeProduto, 0);
 
+        // verificar se há estoque suficiente
         if (produto.getEstoque() > quantidadeEmCarrinho) {
             carrinhoItens.put(nomeProduto, quantidadeEmCarrinho + 1);
             Toast.makeText(this, nomeProduto + " adicionado! Total em carrinho: " + (quantidadeEmCarrinho + 1), Toast.LENGTH_SHORT).show();

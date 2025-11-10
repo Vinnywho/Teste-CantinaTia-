@@ -9,6 +9,7 @@ public class Produto implements Serializable {
     private String emoji;
     private int estoque;
 
+    // construtor
     public Produto(int id, String nome, double preco, String emoji, int estoque) {
         this.id = id;
         this.nome = nome;
@@ -17,6 +18,7 @@ public class Produto implements Serializable {
         this.estoque = estoque;
     }
 
+    // construtor sem ID
     public Produto(String nome, double preco, String emoji, int estoque) {
         this.nome = nome;
         this.preco = preco;

@@ -17,15 +17,17 @@ import java.util.List;
 
 public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.AlimentoViewHolder> implements Filterable {
 
+    // declaração de interface para lidar com cliques no botão de adicionar
     public interface OnItemClickListener {
         void onAdicionarClick(Produto produto);
     }
-
+    // declaração de variáveis
     private List<Produto> listaProdutos;
     private final List<Produto> listaProdutosCompleta;
     private final Context context;
     private final OnItemClickListener listener;
 
+    // construtor da classe
     public AlimentoAdapter(Context context, List<Produto> listaProdutos, OnItemClickListener listener) {
         this.context = context;
         this.listaProdutos = listaProdutos;
@@ -33,6 +35,7 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
         this.listener = listener;
     }
 
+    // métodos da classe RecyclerView.Adapter e Filterable
     @NonNull
     @Override
     public AlimentoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,6 +43,7 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
         return new AlimentoViewHolder(view);
     }
 
+    // métodos para vincular os dados do produto à view holder e lidar com cliques no botão de adicionar
     @Override
     public void onBindViewHolder(@NonNull AlimentoViewHolder holder, int position) {
         Produto produto = listaProdutos.get(position);
@@ -59,16 +63,17 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
         });
     }
 
+    // métodos para obter o número de itens na lista
     @Override
     public int getItemCount() {
         return listaProdutos.size();
     }
-
+    // métodos para obter o filtro da lista de produtos
     @Override
     public Filter getFilter() {
         return foodFilter;
     }
-
+    // métodos para filtrar a lista de produtos com base no texto de pesquisa
     private final Filter foodFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
@@ -90,7 +95,7 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
             results.values = listaFiltrada;
             return results;
         }
-
+        // atualizar a lista de produtos com base na lista filtrada
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             listaProdutos.clear();
@@ -98,7 +103,7 @@ public class AlimentoAdapter extends RecyclerView.Adapter<AlimentoAdapter.Alimen
             notifyDataSetChanged();
         }
     };
-
+    // classe para representar a view holder do item da lista de produtos
     public static class AlimentoViewHolder extends RecyclerView.ViewHolder {
         TextView emojiView;
         TextView nomeAlimento, precoAtual, txtEstoque;

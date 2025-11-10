@@ -9,7 +9,7 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-
+    // declarar variáveis
     private Button btnLogin;
     private Button btnCadastro;
 
@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnCadastro = findViewById(R.id.btnCadastro);
 
+        // ação botão "login"
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(irParaTerceiraTela);
             }
         });
-
+        // ação botão "cadastrar"
         btnCadastro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

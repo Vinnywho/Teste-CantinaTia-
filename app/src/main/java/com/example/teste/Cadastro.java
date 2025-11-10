@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class Cadastro extends AppCompatActivity {
 
-    // Identificadores de Layout
+    // declarar variáveis
     private EditText nomeEditText;
     private EditText raEditText;
     private EditText emailEditText;
@@ -36,10 +36,12 @@ public class Cadastro extends AppCompatActivity {
     private Button butaoConfirmar;
     private Button tenhoContaButton;
 
+    // chaves supabase
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
     private static final String API_URL = SUPABASE_URL + "/rest/v1/users_app";
 
+    // fila de requisição
     private RequestQueue requestQueue;
 
     @Override
@@ -49,6 +51,7 @@ public class Cadastro extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(this);
 
+        // vincular variáveis
         nomeEditText = findViewById(R.id.nome);
         raEditText = findViewById(R.id.editNome3);
         emailEditText = findViewById(R.id.editNome2);
@@ -57,7 +60,7 @@ public class Cadastro extends AppCompatActivity {
         tenhoContaButton = findViewById(R.id.tenhoConta);
 
 
-
+        // ação botão "tenho conta"
         tenhoContaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,7 +69,7 @@ public class Cadastro extends AppCompatActivity {
             }
         });
 
-
+        // ação botão "confirmar"
         butaoConfirmar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,17 +78,22 @@ public class Cadastro extends AppCompatActivity {
         });
     }
 
+    // função cadastrar usuário
     private void cadastrarUsuario() {
+
+        // pegar dados dos campos de texto e converter para string
         final String nome = nomeEditText.getText().toString().trim();
         final String ra = raEditText.getText().toString().trim();
         final String email = emailEditText.getText().toString().trim();
         final String senha = senhaEditText.getText().toString().trim();
 
+        // verificar se os campos estão vazios
         if (nome.isEmpty() || ra.isEmpty() || email.isEmpty() || senha.isEmpty()) {
             Toast.makeText(Cadastro.this, "Preencha todos os campos!", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // criar objeto JSON com os dados do usuário
         JSONObject userJson = new JSONObject();
         try {
             userJson.put("name", nome);
@@ -94,12 +102,14 @@ public class Cadastro extends AppCompatActivity {
             userJson.put("password", senha);
         } catch (JSONException e) {
             e.printStackTrace();
-            Toast.makeText(Cadastro.this, "Erro ao preparar os dados.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Cadastro.this, "Erro ao preparar os dados.", Toast.LENGTH_SHORT).show(); // notificar erro
             return;
         }
 
+        // converter objeto JSON para string
         final String requestBody = userJson.toString();
 
+        // fazer requisição POST para a API do Supabase
         StringRequest request = new StringRequest(Request.Method.POST, API_URL,
                 new Response.Listener<String>() {
                     @Override
@@ -133,11 +143,13 @@ public class Cadastro extends AppCompatActivity {
                     }
                 }) {
 
+            // configurar cabeçalho da requisição com o tipo de conteúdo
             @Override
             public String getBodyContentType() {
                 return "application/json; charset=utf-8";
             }
 
+            // configurar corpo da requisição com os dados do usuário
             @Override
             public byte[] getBody() {
                 try {
@@ -147,6 +159,7 @@ public class Cadastro extends AppCompatActivity {
                 }
             }
 
+            // configurar cabeçalho da requisição com a chave de autenticação
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
@@ -156,6 +169,7 @@ public class Cadastro extends AppCompatActivity {
             }
         };
 
+        // adicionar requisição à fila
         requestQueue.add(request);
     }
 }
