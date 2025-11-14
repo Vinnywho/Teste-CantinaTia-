@@ -1,10 +1,12 @@
 package com.example.teste;
 
-import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log; // Adicionado para logs de erro
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response; // Importação necessária
+import com.android.volley.VolleyError; // Importação necessária
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.carousel.CarouselLayoutManager;
@@ -43,13 +47,14 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
     private RecyclerView recyclerView;
     private EditText editTextText;
     private AlimentoAdapter alimentoAdapter;
-
+    private RequestQueue requestQueue; // Adicionado RequestQueue para Volley
 
     // declarar variáveis de controle de fluxo
     private HashMap<String, Integer> carrinhoItens = new HashMap<>();
 
     // chaves do supabase
-    private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=name,price,image,quantity";
+    private static final String SUPABASE_PRODUCT_URL = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/products?select=name,price,image,quantity";
+    private static final String SUPABASE_USER_API = "https://tganxelcsfitizoffvyn.supabase.co/rest/v1/users_app";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
 
     // launcher para abrir a tela de carrinho e receber os dados de retorno
@@ -74,6 +79,8 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_telainicial);
 
+        requestQueue = Volley.newRequestQueue(this); // Inicializa RequestQueue
+
         // vincular variáveis
         perfil = findViewById(R.id.perfilInicio);
         carrinho = findViewById(R.id.carrinhoInicio);
@@ -82,14 +89,10 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         home = findViewById(R.id.homeInicio);
         editTextText = findViewById(R.id.editTextText);
 
-        // pegar nome do usuário
-        String nomeRecebido = getIntent().getStringExtra("nomeUsuario");
-        if (nomeRecebido != null && !nomeRecebido.isEmpty()) {
-            txtSaudacao1.setText("Bem vindo(a), " + nomeRecebido + "!");
-        } else {
-            txtSaudacao1.setText("Bem vindo(a)!");
-        }
+        // 🎯 AÇÃO CRÍTICA: Carregar o estado do usuário
+        carregarEstadoUsuario();
 
+        // --- O RESTANTE DO SEU CÓDIGO PERMANECE IGUAL ---
         buscarProdutosSupabase();
 
         // ação botão "pesquisar"
@@ -145,6 +148,64 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         recyclerView1.setAdapter(adapter);
     }
 
+    // 🎯 NOVO MÉTODO: Carregar estado do usuário
+    private void carregarEstadoUsuario() {
+        SharedPreferences preferencias = getSharedPreferences("PreferenciasUsuario", MODE_PRIVATE);
+        String emailUsuario = preferencias.getString("emailDoUsuario", null);
+
+        // Prioridade: Tenta obter o nome do Intent (se veio do Login)
+        String nomeRecebido = getIntent().getStringExtra("nomeUsuario");
+
+        if (nomeRecebido != null && !nomeRecebido.isEmpty()) {
+            txtSaudacao1.setText("Bem vindo(a), " + nomeRecebido + "!");
+        } else if (emailUsuario != null) {
+            // Se veio de outra tela (pagamento) e não tem nome no Intent,
+            // busca o nome usando o email persistido.
+            buscarNomeUsuarioPeloEmail(emailUsuario);
+        } else {
+            txtSaudacao1.setText("Bem vindo(a)!");
+            // Opcional: Redirecionar para o login se não houver sessão persistida.
+        }
+    }
+
+    // 🎯 NOVO MÉTODO: Busca o nome do usuário pelo email persistido
+    private void buscarNomeUsuarioPeloEmail(String email) {
+        String userDetailsUrl = SUPABASE_USER_API + "?select=name&email=eq." + email;
+
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, userDetailsUrl, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        if (response.length() > 0) {
+                            try {
+                                JSONObject user = response.getJSONObject(0);
+                                String nomeUsuario = user.getString("name");
+                                txtSaudacao1.setText("Bem vindo(a), " + nomeUsuario + "!");
+
+                            } catch (JSONException e) {
+                                Log.e("HomeVolley", "Erro ao processar detalhes do usuário.", e);
+                            }
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("HomeVolley", "Erro ao carregar nome da sessão: " + error.getMessage());
+                        txtSaudacao1.setText("Bem vindo(a)!");
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("apikey", SUPABASE_ANON_KEY);
+                return headers;
+            }
+        };
+
+        requestQueue.add(request);
+    }
+
     // buscar produtos do Supabase
     private void buscarProdutosSupabase() {
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -152,7 +213,7 @@ public class TelaInicial extends AppCompatActivity implements AlimentoAdapter.On
         // fazer requisição GET para a API do Supabase
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
                 Request.Method.GET,
-                SUPABASE_URL,
+                SUPABASE_PRODUCT_URL,
                 null,
                 new com.android.volley.Response.Listener<JSONArray>() {
                     @Override

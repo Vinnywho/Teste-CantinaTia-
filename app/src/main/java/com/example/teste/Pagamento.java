@@ -29,77 +29,74 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID; // Importação necessária
 
 public class Pagamento extends AppCompatActivity {
-    // chaves do supabase
+    // --- CHAVES DE CONFIGURAÇÃO ---
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
     private static final String USER_API_URL = SUPABASE_URL + "/rest/v1/users_app";
-    private static final String PEDIDOS_API_URL = SUPABASE_URL + "/rest/v1/pedidos";
-    private static final String PEDIDOS_PRODUTOS_API_URL = SUPABASE_URL + "/rest/v1/pedidos_produtos";
-    private static final String PRODUCTS_API_URL = SUPABASE_URL + "/rest/v1/products";
+    private static final String MP_BACKEND_API_URL = "https://tganxelcsfitizoffvyn.supabase.co/functions/v1/quick-handler";
 
-    // declarar variáveis
+    // --- VARIÁVEIS DE CONTROLE ---
     private TextView valorTotal;
     private RadioGroup rgPagamento;
     private Button btnConfirmar, cancelar;
-    // declarar variáveis de controle de fluxo
-    private String metodoPagamentoSelecionado = "Não selecionado"; // inicialmente, não há método de pagamento selecionado
-    private String valorDaCompra = null; // inicialmente, não há valor da compra
-    private String emailDoUsuario = null; // inicialmente, não há email do usuário
-    private int userId = -1; // inicialmente, o ID do usuário é desconhecido
-    private List<ItemCarrinho> itensDoCarrinho = new ArrayList<>(); // inicialmente, o carrinho está vazio
+
+    private String metodoPagamentoSelecionado = "Não selecionado";
+    private String valorDaCompraExibido = "0.00";
+    private String emailDoUsuario = null;
+    private String userId = null;
+    private List<ItemCarrinho> itensDoCarrinho = new ArrayList<>();
+
+    // 🎯 NOVO: Chave única de idempotência, gerada uma vez por tela de pagamento
+    private final String idempotencyId = UUID.randomUUID().toString();
 
     private RequestQueue requestQueue;
-    private int itensPendentesParaAtualizar = 0;
-    private int falhasDeEstoque = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pagamento);
-        // vincular variáveis
+
         requestQueue = Volley.newRequestQueue(this);
 
+        // --- VINCULAÇÃO E DADOS INICIAIS ---
         valorTotal = findViewById(R.id.valorTotal);
         rgPagamento = findViewById(R.id.rgPagamento);
         btnConfirmar = findViewById(R.id.btnConfirmar);
         cancelar = findViewById(R.id.cancelar);
-        // pegar dados da tela anterior e passar para esta
-        valorDaCompra = getIntent().getStringExtra("total");
-        SharedPreferences preferencias = getSharedPreferences("PreferenciasUsuario", MODE_PRIVATE); // 'sharedPreferences' para 'preferenciasCompartilhadas'
+
+        SharedPreferences preferencias = getSharedPreferences("PreferenciasUsuario", MODE_PRIVATE);
         emailDoUsuario = preferencias.getString("emailDoUsuario", null);
 
-        // pegar itens do carrinho
         if (getIntent().hasExtra("itensCarrinho")) {
             itensDoCarrinho = (List<ItemCarrinho>) getIntent().getSerializableExtra("itensCarrinho");
+
+            double totalParaExibicao = 0.0;
+            for (ItemCarrinho item : itensDoCarrinho) {
+                totalParaExibicao += item.getPrecoTotal();
+            }
+            valorDaCompraExibido = String.valueOf(totalParaExibicao);
         }
 
-        // exibir valor total da compra no TextView
-        if (valorDaCompra != null) {
-            try {
-                double valorDouble = Double.parseDouble(valorDaCompra);
-                valorTotal.setText("Total " + String.format(Locale.getDefault(), "R$ %.2f", valorDouble));
-            } catch (NumberFormatException e) {
-                valorTotal.setText("Total R$0.00");
-                valorDaCompra = "0.00";
-            }
-        } else {
-            valorDaCompra = "0.00";
+        try {
+            double valorDouble = Double.parseDouble(valorDaCompraExibido);
+            valorTotal.setText("Total " + String.format(Locale.getDefault(), "R$ %.2f", valorDouble));
+        } catch (NumberFormatException e) {
             valorTotal.setText("Total R$0.00");
         }
 
-        // pegar ID do usuário
         if (emailDoUsuario != null) {
             fetchUserIdByEmail(emailDoUsuario);
         } else {
-            Toast.makeText(this, "Atenção: Email do usuário não encontrado!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Atenção: Email do usuário não encontrado! Não é possível prosseguir.", Toast.LENGTH_LONG).show();
+            btnConfirmar.setEnabled(false);
         }
 
-        // ação botão "cancelar"
+        // --- LISTENERS ---
         cancelar.setOnClickListener(v -> finish());
 
-        // ação botão "confirmar"
         rgPagamento.setOnCheckedChangeListener((group, checkedId) -> {
             RadioButton selectedRadioButton = findViewById(checkedId);
             if (selectedRadioButton != null) {
@@ -109,7 +106,6 @@ public class Pagamento extends AppCompatActivity {
             }
         });
 
-        // ação botão "confirmar"
         btnConfirmar.setOnClickListener(v -> {
             int selectedId = rgPagamento.getCheckedRadioButtonId();
 
@@ -118,35 +114,43 @@ public class Pagamento extends AppCompatActivity {
                 return;
             }
 
-            if (userId == -1) {
-                Toast.makeText(Pagamento.this, "Aguardando confirmação do usuário. Tente novamente.", Toast.LENGTH_SHORT).show();
+            if (userId == null) {
+                Toast.makeText(Pagamento.this, "Aguardando confirmação do usuário (ID). Tente novamente.", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            if (!metodoPagamentoSelecionado.toLowerCase().contains("pix")) {
+                Toast.makeText(Pagamento.this, "Apenas PIX está implementado nesta demonstração.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 🎯 CORREÇÃO: Desabilitar o botão para prevenir o duplo clique
+            btnConfirmar.setEnabled(false);
 
             iniciarConfirmacaoPedido();
         });
     }
 
-    // pegar ID do usuário a partir do email
+    // --- MÉTODOS DE REDE ---
+
     private void fetchUserIdByEmail(String email) {
         String url = USER_API_URL + "?select=id&email=eq." + email;
 
-        // fazer requisição GET para a API do Supabase com o email do usuário
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,
                 response -> {
                     try {
                         if (response.length() > 0) {
-                            userId = response.getJSONObject(0).getInt("id"); // pegar o ID do usuário retornado pela API
+                            userId = response.getJSONObject(0).getString("id");
                         } else {
                             Toast.makeText(Pagamento.this, "Usuário não cadastrado!", Toast.LENGTH_LONG).show();
                         }
                     } catch (JSONException e) {
+                        Log.e("SUPABASE", "Erro ao processar ID do usuário.", e);
                     }
                 },
                 error -> {
                     Toast.makeText(Pagamento.this, "Erro ao buscar ID do usuário.", Toast.LENGTH_LONG).show();
                 }) {
-            // configurar cabeçalho da requisição com a chave de autenticação
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
@@ -155,214 +159,101 @@ public class Pagamento extends AppCompatActivity {
                 return headers;
             }
         };
-
-        // adicionar a requisição à fila
         requestQueue.add(jsonArrayRequest);
     }
 
-    // iniciar confirmação do pedido
+    // Envia o pedido para a Função Serverless (com a chave de idempotência)
     private void iniciarConfirmacaoPedido() {
-        if (userId == -1 || valorDaCompra == null) {
-            Toast.makeText(this, "Erro interno: Dados de usuário ou valor da compra inválidos.", Toast.LENGTH_LONG).show();
+        if (userId == null || itensDoCarrinho.isEmpty()) {
+            Toast.makeText(this, "Erro interno: Dados de usuário ou carrinho inválidos.", Toast.LENGTH_LONG).show();
+            btnConfirmar.setEnabled(true);
             return;
         }
 
-        // fazer requisição POST para a API do Supabase para criar o pedido
         try {
-            JSONObject pedidoJson = new JSONObject();
-            pedidoJson.put("user_app_id", userId);
-            pedidoJson.put("valor_total", Double.parseDouble(valorDaCompra));
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("user_app_id", userId);
+            requestBody.put("metodo_pagamento", "pix");
+            // 🎯 NOVO: Enviar a chave única de idempotência
+            requestBody.put("referencia_unica", idempotencyId);
 
-            String url = PEDIDOS_API_URL + "?select=*";
-
-            // fazer requisição POST para a API do Supabase para criar o pedido
-            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, url, new JSONArray().put(pedidoJson),
-                    response -> {
-                        try {
-                            if (response.length() > 0) {
-                                int novoPedidoId = response.getJSONObject(0).getInt("id");
-                                salvarItensPedido(novoPedidoId);
-                            } else {
-                                Toast.makeText(Pagamento.this, "Erro: Pedido não retornado pelo servidor.", Toast.LENGTH_LONG).show();
-                            }
-                        } catch (JSONException e) {
-                            Toast.makeText(Pagamento.this, "Erro ao processar a resposta do pedido.", Toast.LENGTH_LONG).show();
-                        }
-                    },
-                    error -> {
-                        String errorMsg = "Falha de rede ao criar pedido.";
-                        if (error.networkResponse != null) {
-                            errorMsg += " Status: " + error.networkResponse.statusCode;
-                        }
-                        Toast.makeText(Pagamento.this, errorMsg, Toast.LENGTH_LONG).show();
-                    }) {
-                // configurar cabeçalho da requisição com a chave de autenticação
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("apikey", SUPABASE_ANON_KEY);
-                    headers.put("Authorization", "Bearer " + SUPABASE_ANON_KEY);
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Prefer", "return=representation");
-                    return headers;
-                }
-            };
-            // adicionar a requisição à fila
-            requestQueue.add(jsonArrayRequest);
-
-        } catch (JSONException | NumberFormatException e) {
-            Toast.makeText(this, "Erro de processamento dos dados do pedido.", Toast.LENGTH_LONG).show();
-        }
-    }
-    // finalizar pedido com sucesso e exibir mensagem
-    private void finalizarPedidoComSucesso(int pedidoId) {
-        String mensagem;
-        // verificar se houve falhas de estoque
-        if (falhasDeEstoque > 0) {
-            mensagem = "ALERTA: Pedido #" + pedidoId + " confirmado, mas " + falhasDeEstoque + " item(s) falhou(ram) na atualização de estoque!";
-            Toast.makeText(Pagamento.this, mensagem, Toast.LENGTH_LONG).show();
-        } else {
-            mensagem = "Pedido #" + pedidoId + " (" + metodoPagamentoSelecionado + ") confirmado e estoque atualizado!";
-            Toast.makeText(Pagamento.this, mensagem, Toast.LENGTH_LONG).show();
-        }
-
-        Intent intent = new Intent(Pagamento.this, PedidoConfirmado.class);
-
-        startActivity(intent);
-        finish();
-    }
-
-    // salvar itens do pedido
-    private void salvarItensPedido(int pedidoId) {
-        if (itensDoCarrinho.isEmpty()) {
-            Toast.makeText(this, "Atenção: Carrinho estava vazio ao finalizar.", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
-
-        // fazer requisição POST para a API do Supabase para criar os itens do pedido
-        try {
             JSONArray itensJsonArray = new JSONArray();
 
             for (ItemCarrinho item : itensDoCarrinho) {
                 JSONObject itemJson = new JSONObject();
-                itemJson.put("pedido_id", pedidoId);
                 itemJson.put("produto_id", item.getProduto().getId());
                 itemJson.put("quantidade", item.getQuantidade());
-                itemJson.put("preco_unitario", item.getProduto().getPrecoAtual());
+                itemJson.put("preco_unitario", item.getPrecoUnitario());
                 itensJsonArray.put(itemJson);
             }
-            // fazer requisição POST para a API do Supabase para criar os itens do pedido
-            String urlItens = PEDIDOS_PRODUTOS_API_URL + "?select=*";
+            requestBody.put("itens", itensJsonArray);
 
-            // fazer requisição POST para a API do Supabase para criar os itens do pedido
-            JsonArrayRequest itensRequest = new JsonArrayRequest(Request.Method.POST, urlItens, itensJsonArray,
+            Log.d("PAGAMENTO_REQUEST", "JSON para backend: " + requestBody.toString());
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, MP_BACKEND_API_URL, requestBody,
                     response -> {
-                        itensPendentesParaAtualizar = itensDoCarrinho.size();
-                        falhasDeEstoque = 0;
-                        for (ItemCarrinho item : itensDoCarrinho) {
-                            atualizarEstoque(pedidoId, item);
+                        try {
+                            String novoPedidoIdStr = response.getString("id_pedido_supabase");
+                            String qrCodeBase64 = response.getString("qrCodeBase64");
+                            String ticketUrl = response.getString("ticketUrl");
+
+                            // Chama a função para lançar a próxima tela (com o ID como String)
+                            lancarTelaPix(novoPedidoIdStr, qrCodeBase64, ticketUrl);
+
+                        } catch (JSONException e) {
+                            Log.e("MP_INTEGRATION", "Erro ao processar resposta do Backend. JSON inválido.", e);
+                            Toast.makeText(Pagamento.this, "Erro ao processar dados de pagamento.", Toast.LENGTH_LONG).show();
+                            btnConfirmar.setEnabled(true);
                         }
                     },
                     error -> {
-                        String errorMsg = "Falha ao salvar itens (pedidos_produtos). O pedido (cabeçalho) foi criado. ";
+                        String errorMsg = "Falha de comunicação com o Backend MP.";
                         if (error.networkResponse != null) {
-                            errorMsg += "Status HTTP: " + error.networkResponse.statusCode;
-                            if (error.networkResponse.data != null) {
-                                try {
-                                    String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                                    errorMsg += ". Detalhe: " + responseBody;
-                                } catch (Exception e) {
-                                    errorMsg += ". Resposta do servidor não legível.";
+                            errorMsg += " Status: " + error.networkResponse.statusCode;
+                            try {
+                                String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+                                Log.e("MP_INTEGRATION_FAIL", "Detalhe: " + responseBody);
+                                JSONObject errorJson = new JSONObject(responseBody);
+                                // O erro 409 (Conflito) significa que a idempotência funcionou!
+                                if (error.networkResponse.statusCode == 409) {
+                                    errorMsg = "Pedido duplicado bloqueado. Prosseguindo...";
+                                    // Tente navegar para a próxima tela se a Edge Function retornou o ID.
+                                    // Esta é uma lógica complexa e, por segurança, reabilitamos:
                                 }
-                            }
-                        } else {
-                            errorMsg += "Sem resposta do servidor (Erro de rede/timeout).";
+                                errorMsg += " Detalhe: " + errorJson.optString("mensagem", "Erro desconhecido.");
+                            } catch (Exception e) {}
                         }
-
-                        Log.e("SUPABASE_ITENS", errorMsg, error);
+                        Log.e("MP_INTEGRATION", errorMsg, error);
                         Toast.makeText(Pagamento.this, errorMsg, Toast.LENGTH_LONG).show();
+                        btnConfirmar.setEnabled(true);
                     }) {
-                // configurar cabeçalho da requisição com a chave de autenticação
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String, String> headers = new HashMap<>();
-                    headers.put("apikey", SUPABASE_ANON_KEY);
-                    headers.put("Authorization", "Bearer " + SUPABASE_ANON_KEY);
                     headers.put("Content-Type", "application/json");
-                    headers.put("Prefer", "return=representation");
+                    headers.put("Authorization", "Bearer " + SUPABASE_ANON_KEY);
+                    headers.put("apikey", SUPABASE_ANON_KEY);
                     return headers;
                 }
             };
-
-            requestQueue.add(itensRequest);
+            requestQueue.add(jsonObjectRequest);
 
         } catch (JSONException e) {
-            Toast.makeText(this, "Erro de processamento dos itens do pedido.", Toast.LENGTH_LONG).show();
-            finish();
+            Toast.makeText(this, "Erro de processamento dos dados do pedido.", Toast.LENGTH_LONG).show();
+            btnConfirmar.setEnabled(true);
         }
     }
 
-    // atualizar estoque dos itens do pedido e verificar se houve falhas
-    private void atualizarEstoque(int pedidoId, ItemCarrinho item) {
-        String url = PRODUCTS_API_URL + "?id=eq." + item.getProduto().getId();
+    private void lancarTelaPix(String pedidoIdStr, String qrCodeBase64, String ticketUrl) {
+        String mensagem = "Pedido #" + pedidoIdStr + " criado! Agora pague via PIX.";
+        Toast.makeText(Pagamento.this, mensagem, Toast.LENGTH_LONG).show();
 
-        // fazer requisição PATCH para a API do Supabase para atualizar o estoque
-        try {
-            int novaQuantidade = item.getProduto().getEstoque() - item.getQuantidade();
+        Intent intent = new Intent(Pagamento.this, PedidoConfirmado.class);
+        intent.putExtra("pedidoId", pedidoIdStr);
+        intent.putExtra("qrCodeBase64", qrCodeBase64);
+        intent.putExtra("ticketUrl", ticketUrl);
 
-            // montar JSON de atualização
-            JSONObject jsonUpdate = new JSONObject();
-            jsonUpdate.put("quantity", Math.max(0, novaQuantidade));
-
-            // fazer requisição PATCH para a API do Supabase para atualizar o estoque
-            JsonObjectRequest updateRequest = new JsonObjectRequest(Request.Method.PATCH, url, jsonUpdate,
-                    response -> {
-                        itensPendentesParaAtualizar--;
-
-                        if (itensPendentesParaAtualizar == 0) {
-                            finalizarPedidoComSucesso(pedidoId);
-                        }
-                    },
-                    error -> {
-                        itensPendentesParaAtualizar--;
-                        falhasDeEstoque++;
-
-                        // log de erro
-                        String errorMsg = "FALHA ao atualizar estoque para Produto ID: " + item.getProduto().getId();
-                        if (error.networkResponse != null) {
-                            errorMsg += " Status HTTP: " + error.networkResponse.statusCode;
-                            if (error.networkResponse.data != null) {
-                                try {
-                                    errorMsg += " Detalhe: " + new String(error.networkResponse.data, StandardCharsets.UTF_8);
-                                } catch (Exception e) {}
-                            }
-                        }
-                        Log.e("ESTOQUE", errorMsg);
-
-                        // verificar se houve falhas de estoque
-                        if (itensPendentesParaAtualizar == 0) {
-                            finalizarPedidoComSucesso(pedidoId);
-                        }
-                    }) {
-                // configurar cabeçalho da requisição com a chave de autenticação
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("apikey", SUPABASE_ANON_KEY);
-                    headers.put("Authorization", "Bearer " + SUPABASE_ANON_KEY);
-                    headers.put("Content-Type", "application/json");
-                    headers.put("Content-Profile", "public");
-                    headers.put("Prefer", "return=representation");
-                    headers.put("Accept", "application/vnd.pgrst.object+json, application/json");
-                    return headers;
-                }
-            };
-
-            requestQueue.add(updateRequest);
-
-        } catch (JSONException e) {
-            Log.e("ESTOQUE", "Erro ao montar JSON de atualização de estoque.");
-        }
+        startActivity(intent);
+        finish();
     }
 }

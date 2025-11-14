@@ -101,15 +101,20 @@ public class Carrinho extends AppCompatActivity implements CarrinhoAdapter.OnIte
         });
         // ação botão confirmar pagamento (ir para tela de pagamento)
         confirmarPagamento.setOnClickListener(v -> {
-            double total = 0.0;
+            List<ItemCarrinho> itensParaPagamento = new ArrayList<>();
 
             for (ItemCarrinho item : listaItensCarrinho) {
-                total += item.getPrecoTotal();
+                itensParaPagamento.add(item);
+            }
+
+            if (itensParaPagamento.isEmpty()) {
+                Toast.makeText(Carrinho.this, "Carrinho vazio. Adicione itens antes de prosseguir.", Toast.LENGTH_SHORT).show();
+                return;
             }
 
             Intent irParaPagamento = new Intent(Carrinho.this, Pagamento.class);
-            irParaPagamento.putExtra("total", String.valueOf(total));
-            irParaPagamento.putExtra("itensCarrinho", (Serializable) listaItensCarrinho);
+
+            irParaPagamento.putExtra("itensCarrinho", (Serializable) itensParaPagamento);
             startActivity(irParaPagamento);
         });
     }

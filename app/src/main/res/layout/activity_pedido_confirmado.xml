@@ -19,19 +19,6 @@
         app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/rectangle_174" />
 
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="336dp"
-        android:layout_height="63dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.339"
-        app:srcCompat="@drawable/vector_8" />
-
     <ImageView
         android:id="@+id/imageView8"
         android:layout_width="wrap_content"
@@ -40,10 +27,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/group_6" />
 
-
-
     <ImageView
-        android:id="@+id/imageView7"
+        android_id="@+id/imageView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -51,36 +36,81 @@
         app:srcCompat="@drawable/ellipse_16" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/txtTituloStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="O pedido já entrou na fila de reprodução!"
+        android:layout_marginTop="100dp"
+        android:text="PAGAMENTO PENDENTE"
         android:textColor="#FFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7"
-        app:layout_constraintVertical_bias="0.042" />
-
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="52dp"
-        android:text="Pedido confirmado"
-        android:textColor="#FFF"
-        android:textSize="15dp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView4" />
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtNumeroPedido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Nº: #00000"
+        android:textColor="#FFF"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtTituloStatus" />
+
+    <TextView
+        android:id="@+id/txtInstrucao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Escaneie o QR Code ou copie a chave PIX."
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtNumeroPedido"
+        android:layout_marginTop="16dp"/>
+
+
+    <ImageView
+        android:id="@+id/imgQrCodePix"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="40dp"
+        android:background="#FFF"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtInstrucao"
+        tools:src="@drawable/ic_launcher_background" />
+
+    <TextView
+        android:id="@+id/txtChavePix"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:background="#C0C0C0"
+        android:maxLines="5"
+        android:padding="12dp"
+        android:text="Chave PIX (Toque para copiar)"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgQrCodePix" />
 
     <Button
         android:id="@+id/pedidoConfirmado"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="OK"
+        android:text="ENTENDI"
         android:backgroundTint="#fff"
         android:textColor="#000"
         android:textStyle="bold"
@@ -88,6 +118,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6"
-        app:layout_constraintVertical_bias="0.067" />
+        app:layout_constraintTop_toBottomOf="@+id/txtChavePix"
+        app:layout_constraintVertical_bias="0.1" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
