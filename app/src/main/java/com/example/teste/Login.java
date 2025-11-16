@@ -11,35 +11,31 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.io.UnsupportedEncodingException;
 
 public class Login extends AppCompatActivity {
 
-    // declarar variáveis
     private EditText emailRaEditText;
     private EditText senhaEditText;
     private Button butaoLogin;
     private Button btnCadastro;
 
-    // chaves supabase
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
-    private static final String API_URL = SUPABASE_URL + "/rest/v1/users_app";
+
+    private static final String AUTH_SIGNIN_URL = SUPABASE_URL + "/auth/v1/token?grant_type=password";
 
     private RequestQueue requestQueue;
 
@@ -47,7 +43,7 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // vincular variáveis
+
         requestQueue = Volley.newRequestQueue(this);
 
         emailRaEditText = findViewById(R.id.nome);
@@ -55,13 +51,11 @@ public class Login extends AppCompatActivity {
         butaoLogin = findViewById(R.id.buto);
         btnCadastro = findViewById(R.id.btnEnviar);
 
-        // ação botão "cadastrar"
         btnCadastro.setOnClickListener(v -> {
             Intent irParaCadastro = new Intent(Login.this, Cadastro.class);
             startActivity(irParaCadastro);
         });
 
-        // ação botão "login"
         butaoLogin.setOnClickListener(v -> {
             fazerLogin();
         });
@@ -69,68 +63,86 @@ public class Login extends AppCompatActivity {
 
     private void fazerLogin() {
 
-        // pegar dados dos campos de texto e converter para string
         final String email = emailRaEditText.getText().toString().trim();
         final String senha = senhaEditText.getText().toString().trim();
 
-        // verificar se os campos estão vazios
         if (email.isEmpty() || senha.isEmpty()) {
-            Toast.makeText(Login.this, "Preencha Email/RA e Senha.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(Login.this, "Preencha Email e Senha.", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // fazer requisição GET para a API do Supabase com os dados do usuário
-        String loginUrl = API_URL + "?email=eq." + email + "&password=eq." + senha;
+        JSONObject loginJson = new JSONObject();
+        try {
+            loginJson.put("email", email);
+            loginJson.put("password", senha);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Toast.makeText(Login.this, "Erro ao preparar os dados de login.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-
-        // fazer requisição GET para a API do Supabase com os dados do usuário
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, loginUrl, null,
-                new Response.Listener<JSONArray>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, AUTH_SIGNIN_URL, loginJson,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String accessToken = response.getString("access_token");
+                            JSONObject user = response.getJSONObject("user");
+                            String emailUsuario = user.getString("email");
+                            String userId = user.getString("id");
 
-                        if (response.length() > 0) {
-                            try {
-                                JSONObject user = response.getJSONObject(0);
-                                String nomeUsuario = user.getString("name");
-                                String emailUsuario = user.getString("email");
+                            SharedPreferences preferenciasCompartilhadas = getSharedPreferences("PreferenciasUsuario", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferenciasCompartilhadas.edit();
+                            editor.putString("auth_token", accessToken);
+                            editor.putString("emailDoUsuario", emailUsuario);
+                            editor.putString("userId", userId);
+                            editor.apply();
 
-                                // salvar dados do usuário em SharedPreferences
-                                SharedPreferences preferenciasCompartilhadas = getSharedPreferences("PreferenciasUsuario", MODE_PRIVATE); // 'sharedPreferences' para 'preferenciasCompartilhadas'
-                                SharedPreferences.Editor editor = preferenciasCompartilhadas.edit();
-                                editor.putString("emailDoUsuario", emailUsuario);
-                                editor.apply();
+                            Toast.makeText(Login.this, "Login efetuado! Bem-vindo(a), " + emailUsuario, Toast.LENGTH_LONG).show();
 
-                                Toast.makeText(Login.this, "Login efetuado! Bem-vindo(a), " + nomeUsuario, Toast.LENGTH_LONG).show();
+                            Intent irParaTelaInicial = new Intent(Login.this, TelaInicial.class);
+                            irParaTelaInicial.putExtra("userId", userId);
+                            startActivity(irParaTelaInicial);
+                            finish();
 
-                                Intent irParaTelaInicial = new Intent(Login.this, TelaInicial.class);
-                                irParaTelaInicial.putExtra("nomeUsuario", nomeUsuario);
-                                startActivity(irParaTelaInicial);
-                                finish();
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(Login.this, "Erro ao processar dados do usuário.", Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Toast.makeText(Login.this, "Credenciais inválidas. Verifique o Email/RA e Senha.", Toast.LENGTH_LONG).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(Login.this, "Erro ao processar a resposta do servidor.", Toast.LENGTH_LONG).show();
                         }
                     }
                 },
-                // lidar com erros na requisição
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("LoginVolley", "Erro na requisição: " + error.getMessage());
-                        Toast.makeText(Login.this, "Erro de comunicação com o servidor.", Toast.LENGTH_LONG).show();
+                        Log.e("LoginAuthVolley", "Erro no login: " + error.toString());
+                        String errorMessage = "Login falhou. Verifique seu Email e Senha.";
+
+                        if (error.networkResponse != null) {
+                            try {
+                                String responseBody = new String(error.networkResponse.data, "utf-8");
+                                JSONObject errorJson = new JSONObject(responseBody);
+
+                                if (errorJson.has("error_description")) {
+                                    errorMessage = errorJson.getString("error_description");
+                                } else if (errorJson.has("msg")) {
+                                    errorMessage = errorJson.getString("msg");
+                                } else {
+                                    errorMessage = "Erro HTTP: " + error.networkResponse.statusCode;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        Toast.makeText(Login.this, errorMessage, Toast.LENGTH_LONG).show();
                     }
                 }) {
 
-            // configurar cabeçalho da requisição com a chave de autenticação
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> headers = new HashMap<>();
                 headers.put("apikey", SUPABASE_ANON_KEY);
+                headers.put("Content-Type", "application/json");
                 return headers;
             }
         };

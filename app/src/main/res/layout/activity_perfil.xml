@@ -2,20 +2,38 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="#FFF"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <ImageView
-        android:id="@+id/fotoPerfil"
+        android:id="@+id/imageView19"
+        android:layout_width="427dp"
+        android:layout_height="627dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/rectangle_638" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewFotoPerfil"
         android:layout_width="130dp"
-        android:layout_height="137dp"
-        android:layout_marginTop="20sp"
+        android:layout_height="130dp" android:layout_marginTop="20sp"
+        app:cardCornerRadius="65dp"  app:cardElevation="4dp"
+        app:layout_constraintBottom_toTopOf="@id/nomeUsuario"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/perfil"
-        app:layout_constraintBottom_toTopOf="@id/nomeUsuario"
-        app:srcCompat="@drawable/perfil" />
+        app:layout_constraintTop_toBottomOf="@id/perfil">
+
+        <ImageView
+            android:id="@+id/fotoPerfil"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/perfil" />
+    </androidx.cardview.widget.CardView>
+
 
     <TextView
         android:id="@+id/perfil"
@@ -25,48 +43,53 @@
         android:text="PERFIL"
         android:textStyle="bold"
         android:textSize="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/fotoPerfil"
+        app:layout_constraintBottom_toTopOf="@+id/cardViewFotoPerfil"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ListView
-        android:id="@+id/listaConfig"
-        android:layout_width="425dp"
-        android:layout_height="547dp"
-        android:layout_marginTop="28dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nomeUsuario" />
+<!--    <ListView-->
+<!--        android:id="@+id/listaConfig"-->
+<!--        android:layout_width="425dp"-->
+<!--        android:layout_height="547dp"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="1.0"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/nomeUsuario" />-->
 
     <TextView
         android:id="@+id/nomeUsuario"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="36dp"
+        android:textStyle="italic"
+        android:textSize="20dp"
         android:text="Nome"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fotoPerfil" />
+        app:layout_constraintTop_toBottomOf="@+id/cardViewFotoPerfil" />
 
     <ImageView
         android:id="@+id/navbarPerfil"
         android:layout_width="0dp"
         android:layout_height="112dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/rectangle_99" />
+        app:srcCompat="@drawable/rectangle_89" />
 
     <ImageView
         android:id="@+id/homePerfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="48dp"
         app:layout_constraintBottom_toBottomOf="@+id/navbarPerfil"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.164"
+        app:layout_constraintHorizontal_bias="0.162"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/silhueta_negra_de_casa_sem_porta__1__1" />
 
@@ -74,7 +97,7 @@
         android:id="@+id/carrinhoPerfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/perfilPerfil"
         app:layout_constraintStart_toEndOf="@+id/homePerfil"
@@ -84,11 +107,97 @@
         android:id="@+id/perfilPerfil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="64dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.766"
+        app:layout_constraintHorizontal_bias="0.77"
         app:layout_constraintStart_toEndOf="@+id/homePerfil"
         app:srcCompat="@drawable/do_utilizador_2" />
+
+    <Button
+        android:id="@+id/editarPerfil"
+        android:layout_width="351dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="148dp"
+        android:backgroundTint="#0A190F"
+        android:paddingLeft="60dp"
+        android:text="Editar Perfil"
+        android:textAlignment="textStart"
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView19"
+        app:layout_constraintStart_toStartOf="@+id/imageView19"
+        app:layout_constraintTop_toTopOf="@+id/imageView19" />
+
+    <Button
+        android:id="@+id/historico"
+        android:paddingLeft="60dp"
+        android:textSize="18dp"
+        android:textAlignment="textStart"
+        android:layout_width="351dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#0A190F"
+        android:layout_marginTop="30dp"
+        android:text="Histórico de compras"
+        app:layout_constraintEnd_toEndOf="@+id/editarPerfil"
+        app:layout_constraintStart_toStartOf="@+id/editarPerfil"
+        app:layout_constraintTop_toBottomOf="@+id/editarPerfil" />
+
+    <Button
+        android:id="@+id/button5"
+        android:paddingLeft="60dp"
+        android:textSize="18dp"
+        android:textAlignment="textStart"
+        android:layout_width="351dp"
+        android:layout_height="70dp"
+        android:backgroundTint="#0A190F"
+        android:layout_marginTop="30dp"
+        android:text="Fidelidade"
+        app:layout_constraintEnd_toEndOf="@+id/historico"
+        app:layout_constraintStart_toStartOf="@+id/historico"
+        app:layout_constraintTop_toBottomOf="@+id/historico" />
+
+    <ImageView
+        android:id="@+id/imageView21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/editarPerfil"
+        app:layout_constraintEnd_toEndOf="@+id/editarPerfil"
+        app:layout_constraintHorizontal_bias="0.04"
+        app:layout_constraintStart_toStartOf="@+id/editarPerfil"
+        app:layout_constraintTop_toTopOf="@+id/editarPerfil"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
+
+    <ImageView
+        android:id="@+id/imageView22"
+        android:layout_width="41dp"
+        android:layout_height="43dp"
+        app:layout_constraintBottom_toBottomOf="@+id/historico"
+        app:layout_constraintEnd_toEndOf="@+id/historico"
+        app:layout_constraintHorizontal_bias="0.042"
+        app:layout_constraintStart_toStartOf="@+id/historico"
+        app:layout_constraintTop_toTopOf="@+id/historico"
+        app:srcCompat="@android:drawable/ic_menu_recent_history" />
+
+    <ImageView
+        android:id="@+id/imageView24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/button5"
+        app:layout_constraintEnd_toEndOf="@+id/button5"
+        app:layout_constraintHorizontal_bias="0.042"
+        app:layout_constraintStart_toStartOf="@+id/button5"
+        app:layout_constraintTop_toTopOf="@+id/button5"
+        app:srcCompat="@android:drawable/btn_star" />
+
+    <ImageView
+        android:id="@+id/imageView26"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="44dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imageView19"
+        app:srcCompat="@drawable/vector_8" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

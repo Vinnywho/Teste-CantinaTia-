@@ -13,8 +13,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.ParseError; // ⬅️ IMPORT NECESSÁRIO
 import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.HttpHeaderParser; // ⬅️ IMPORT NECESSÁRIO
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -24,18 +28,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID; // Importação necessária
+import java.util.TimeZone;
+import java.util.UUID;
 
 public class Pagamento extends AppCompatActivity {
     // --- CHAVES DE CONFIGURAÇÃO ---
     private static final String SUPABASE_URL = "https://tganxelcsfitizoffvyn.supabase.co";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYW54ZWxjc2ZpdGl6b2ZmdnluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTgzMTMsImV4cCI6MjA3NzQzNDMxM30.ObZQ__nbVlej-lPE7L0a6mtGj323gI1bRq4DD4SkTeM";
     private static final String USER_API_URL = SUPABASE_URL + "/rest/v1/users_app";
+    private static final String PEDIDOS_API_URL = SUPABASE_URL + "/rest/v1/pedidos";
     private static final String MP_BACKEND_API_URL = "https://tganxelcsfitizoffvyn.supabase.co/functions/v1/quick-handler";
 
     // --- VARIÁVEIS DE CONTROLE ---
@@ -47,9 +55,9 @@ public class Pagamento extends AppCompatActivity {
     private String valorDaCompraExibido = "0.00";
     private String emailDoUsuario = null;
     private String userId = null;
+    private String accessToken = null;
     private List<ItemCarrinho> itensDoCarrinho = new ArrayList<>();
 
-    // 🎯 NOVO: Chave única de idempotência, gerada uma vez por tela de pagamento
     private final String idempotencyId = UUID.randomUUID().toString();
 
     private RequestQueue requestQueue;
@@ -69,6 +77,7 @@ public class Pagamento extends AppCompatActivity {
 
         SharedPreferences preferencias = getSharedPreferences("PreferenciasUsuario", MODE_PRIVATE);
         emailDoUsuario = preferencias.getString("emailDoUsuario", null);
+        accessToken = preferencias.getString("auth_token", null);
 
         if (getIntent().hasExtra("itensCarrinho")) {
             itensDoCarrinho = (List<ItemCarrinho>) getIntent().getSerializableExtra("itensCarrinho");
@@ -92,6 +101,10 @@ public class Pagamento extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Atenção: Email do usuário não encontrado! Não é possível prosseguir.", Toast.LENGTH_LONG).show();
             btnConfirmar.setEnabled(false);
+        }
+
+        if (accessToken == null) {
+            Toast.makeText(this, "Erro: Token de acesso indisponível.", Toast.LENGTH_LONG).show();
         }
 
         // --- LISTENERS ---
@@ -119,15 +132,17 @@ public class Pagamento extends AppCompatActivity {
                 return;
             }
 
-            if (!metodoPagamentoSelecionado.toLowerCase().contains("pix")) {
-                Toast.makeText(Pagamento.this, "Apenas PIX está implementado nesta demonstração.", Toast.LENGTH_SHORT).show();
-                return;
+            // 🎯 INÍCIO DO FLUXO CONDICIONAL
+            btnConfirmar.setEnabled(false); // Desabilitar o botão para prevenir o duplo clique
+
+            if (metodoPagamentoSelecionado.toLowerCase().contains("pix")) {
+                iniciarConfirmacaoPedidoPix();
+            } else if (metodoPagamentoSelecionado.toLowerCase().contains("dinheiro")) {
+                iniciarConfirmacaoPedidoDinheiro();
+            } else {
+                Toast.makeText(Pagamento.this, "Apenas PIX e Dinheiro estão implementados.", Toast.LENGTH_SHORT).show();
+                btnConfirmar.setEnabled(true);
             }
-
-            // 🎯 CORREÇÃO: Desabilitar o botão para prevenir o duplo clique
-            btnConfirmar.setEnabled(false);
-
-            iniciarConfirmacaoPedido();
         });
     }
 
@@ -162,8 +177,67 @@ public class Pagamento extends AppCompatActivity {
         requestQueue.add(jsonArrayRequest);
     }
 
-    // Envia o pedido para a Função Serverless (com a chave de idempotência)
-    private void iniciarConfirmacaoPedido() {
+    // 🎯 NOVO: Fluxo de Pedido com Pagamento em Dinheiro (Inserção Direta)
+    private void iniciarConfirmacaoPedidoDinheiro() {
+        if (userId == null || itensDoCarrinho.isEmpty() || accessToken == null) {
+            Toast.makeText(this, "Erro interno: Dados de usuário, carrinho ou token inválidos.", Toast.LENGTH_LONG).show();
+            btnConfirmar.setEnabled(true);
+            return;
+        }
+
+        try {
+            JSONObject pedidoJson = new JSONObject();
+            pedidoJson.put("user_app_id", userId);
+            pedidoJson.put("metodo_pagamento", "dinheiro");
+            pedidoJson.put("valor_total", Double.parseDouble(valorDaCompraExibido));
+            pedidoJson.put("data_pedido", getCurrentUtcIsoTime());
+            pedidoJson.put("status_pedido", "EM ESPERA");
+
+            // Não incluímos os itens aqui para simplificar a inserção direta
+            // Para inserção completa, use uma Stored Procedure/Edge Function.
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, PEDIDOS_API_URL, pedidoJson,
+                    response -> {
+                        // Resposta de sucesso será tratada pelo parseNetworkResponse
+                        Toast.makeText(Pagamento.this, "Pedido em Dinheiro registrado com sucesso!", Toast.LENGTH_LONG).show();
+                        lancarTelaPedidoSimples();
+                    },
+                    error -> {
+                        Log.e("DINHEIRO_FAIL", "Erro ao inserir pedido: " + error.toString());
+                        Toast.makeText(Pagamento.this, "Falha ao registrar pedido em dinheiro.", Toast.LENGTH_LONG).show();
+                        btnConfirmar.setEnabled(true);
+                    }) {
+
+                // ⬅️ CORREÇÃO CRÍTICA: Tratar resposta vazia (201/204) do PostgREST
+                @Override
+                protected Response<JSONObject> parseNetworkResponse(com.android.volley.NetworkResponse response) {
+                    if (response.statusCode == 201 || response.statusCode == 204) {
+                        // Retorna um objeto JSON vazio, tratando a resposta como sucesso
+                        return Response.success(new JSONObject(), HttpHeaderParser.parseCacheHeaders(response));
+                    }
+                    // Se não for sucesso, chama o parser padrão para tratar erros (4xx/5xx)
+                    return super.parseNetworkResponse(response);
+                }
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("Authorization", "Bearer " + accessToken); // Usa o token de usuário logado
+                    headers.put("apikey", SUPABASE_ANON_KEY);
+                    return headers;
+                }
+            };
+            requestQueue.add(jsonObjectRequest);
+
+        } catch (JSONException | NumberFormatException e) {
+            Toast.makeText(this, "Erro de processamento dos dados do pedido.", Toast.LENGTH_LONG).show();
+            btnConfirmar.setEnabled(true);
+        }
+    }
+
+    // 🎯 NOVO NOME: Fluxo de Pedido com Pagamento PIX
+    private void iniciarConfirmacaoPedidoPix() {
         if (userId == null || itensDoCarrinho.isEmpty()) {
             Toast.makeText(this, "Erro interno: Dados de usuário ou carrinho inválidos.", Toast.LENGTH_LONG).show();
             btnConfirmar.setEnabled(true);
@@ -174,7 +248,6 @@ public class Pagamento extends AppCompatActivity {
             JSONObject requestBody = new JSONObject();
             requestBody.put("user_app_id", userId);
             requestBody.put("metodo_pagamento", "pix");
-            // 🎯 NOVO: Enviar a chave única de idempotência
             requestBody.put("referencia_unica", idempotencyId);
 
             JSONArray itensJsonArray = new JSONArray();
@@ -197,7 +270,6 @@ public class Pagamento extends AppCompatActivity {
                             String qrCodeBase64 = response.getString("qrCodeBase64");
                             String ticketUrl = response.getString("ticketUrl");
 
-                            // Chama a função para lançar a próxima tela (com o ID como String)
                             lancarTelaPix(novoPedidoIdStr, qrCodeBase64, ticketUrl);
 
                         } catch (JSONException e) {
@@ -214,11 +286,8 @@ public class Pagamento extends AppCompatActivity {
                                 String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
                                 Log.e("MP_INTEGRATION_FAIL", "Detalhe: " + responseBody);
                                 JSONObject errorJson = new JSONObject(responseBody);
-                                // O erro 409 (Conflito) significa que a idempotência funcionou!
                                 if (error.networkResponse.statusCode == 409) {
                                     errorMsg = "Pedido duplicado bloqueado. Prosseguindo...";
-                                    // Tente navegar para a próxima tela se a Edge Function retornou o ID.
-                                    // Esta é uma lógica complexa e, por segurança, reabilitamos:
                                 }
                                 errorMsg += " Detalhe: " + errorJson.optString("mensagem", "Erro desconhecido.");
                             } catch (Exception e) {}
@@ -255,5 +324,18 @@ public class Pagamento extends AppCompatActivity {
 
         startActivity(intent);
         finish();
+    }
+
+    private void lancarTelaPedidoSimples() {
+        Intent intent = new Intent(Pagamento.this, PedidoConfirmado.class);
+        intent.putExtra("mensagemStatus", "Seu pedido foi registrado! Pague no balcão.");
+        startActivity(intent);
+        finish();
+    }
+
+    private String getCurrentUtcIsoTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new Date());
     }
 }

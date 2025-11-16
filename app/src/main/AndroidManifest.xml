@@ -54,6 +54,9 @@
 
         <activity android:name=".PagamentoConfirmado" android:exported="false"></activity>
 
+        <activity android:name=".HistoricoActivity" android:exported="false"></activity>
+
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
